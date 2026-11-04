@@ -17,7 +17,7 @@ If you host the build on GitHub Pages, Netlify, etc., the game automatically use
 ## What to upload
 
 - Runtime zip: [tales-and-puzzles-poki.zip](../tales-and-puzzles-poki.zip)
-- Game title: **Tales & Puzzles**
+- Game title: **Tales & Puzzles: The Odyssey**
 - Platform build: HTML5 / Phaser 3.90
 - Current scope: Unit I, five chapters, roughly 15 minutes
 - Controls: mouse/touch, `H` hint, `←`/`→` story pages, `Esc` map
@@ -25,17 +25,32 @@ If you host the build on GitHub Pages, Netlify, etc., the game automatically use
 
 ## Suggested store copy
 
+**Tagline**
+
+> Every legend hides a puzzle.
+
 **Short description**
 
-> A storybook puzzle game. Read a three-page tale, then spot what changed or find what is hidden.
+> Read a short illustrated story, then solve the scene: spot five differences between two paintings or find hidden objects tucked around the picture.
 
 **Long description**
 
-> Tales & Puzzles turns classic stories into playable mysteries. In each chapter, three illustrated pages tell the tale. Then the page becomes a puzzle: compare two paintings and find the differences, or search a scene for hidden objects — some tucked behind covers you must move aside.
+> Read a short illustrated story, then solve the scene. Each chapter asks you to spot five differences between two paintings or find hidden objects — some tucked under covers you can lift.
 >
-> The first unit follows Odysseus on the long way home from Troy, through the lotus shore, the Cyclops' cave, Circe's hall, the Sirens' strait, and the hall of Ithaca.
->
-> Cozy, hand-illustrated, and playable in short sessions. Three hints per chapter; optional rewarded videos can grant extra hints.
+> Follow Odysseus through five chapters, from the lotus shore to Ithaca. Every puzzle is part of a classic tale, so you're not just finding objects: you're uncovering what the story is hiding.
+
+**Instructions**
+
+> Read the chapter's story, then tap the differences between the two paintings or find the objects listed beside the scene. Tap covers to move them. Use the Hint button if you get stuck.
+
+**Feature bullets (optional)**
+
+- Five chapters inspired by the Odyssey
+- A three-page illustrated story in every chapter
+- Three spot-the-difference and two hidden-object puzzles
+- 28 details to find
+- Three hints per chapter
+- Mouse and touch controls; desktop and mobile
 
 **Categories to suggest**
 
