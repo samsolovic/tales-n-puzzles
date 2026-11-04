@@ -50,6 +50,10 @@ If you host the build on GitHub Pages, Netlify, etc., the game automatically use
 - Three hints per chapter
 - Mouse and touch controls; desktop and mobile
 
+## Why it fits Poki
+
+> Tales & Puzzles: The Odyssey takes two familiar casual puzzle types — spot the difference and hidden object — and wraps them in a short illustrated story. The controls are simple (tap or click), it works on desktop and mobile, and each chapter fits a short break. The chapter map makes it easy to come back for one more, while the storybook framing gives a familiar genre a distinctive, memorable look without requiring any prior knowledge of the Odyssey. That makes it a natural fit for Poki's broad casual audience, as well as players who enjoy mythology and story-driven games.
+
 **Categories to suggest**
 
 - Puzzle
