@@ -35,9 +35,7 @@ If you host the build on GitHub Pages, Netlify, etc., the game automatically use
 
 **Long description**
 
-> Read a short illustrated story, then solve the scene. Each chapter asks you to spot five differences between two paintings or find hidden objects — some tucked under covers you can lift.
->
-> Follow Odysseus through five chapters, from the lotus shore to Ithaca. Every puzzle is part of a classic tale, so you're not just finding objects: you're uncovering what the story is hiding.
+> Read a three-page illustrated story, then solve the scene: spot five differences or find hidden objects, some tucked under covers you can lift. Five chapters inspired by the Odyssey turn a classic tale into a cozy puzzle — you're not just finding objects, you're uncovering what the story is hiding.
 
 **Instructions**
 
