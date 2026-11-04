@@ -1,0 +1,15 @@
+{
+  "name": "tales-and-puzzles",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "A narrative puzzle game hidden inside great books and old legends.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "art": "node tools/build-art.mjs"
+  }
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#101a24" />
+    <meta
+      name="description"
+      content="Tales & Puzzles: a narrative puzzle game hidden inside great books and old legends."
+    />
+    <title>Tales &amp; Puzzles</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101a24'/%3E%3Cpath d='M20 17h11c6 0 10 4 10 10v22H30c-6 0-10-4-10-10V17Z' fill='%23d5a85a'/%3E%3Cpath d='M44 17H33c-6 0-10 4-10 10v22h11c6 0 10-4 10-10V17Z' fill='%23f3e6c9'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <div id="game" aria-label="Tales and Puzzles game canvas"></div>
+      <div id="boot-screen" aria-live="polite">
+        <div class="boot-mark" aria-hidden="true">
+          <span></span><span></span>
+        </div>
+        <p class="boot-eyebrow">A GAME OF STORIES &amp; SECRETS</p>
+        <h1>Tales <em>&amp;</em> Puzzles</h1>
+        <p class="boot-status" id="boot-status">Turning the page…</p>
+      </div>
+      <div id="reframing" aria-live="polite">
+        <span>Reframing the pages…</span>
+      </div>
+      <noscript>Please enable JavaScript to enter the story.</noscript>
+    </main>
+    <script>
+      // Poki runs games inside a longer page; keep arrow keys and the wheel
+      // from scrolling the parent document while the game has focus.
+      window.addEventListener('keydown', (event) => {
+        if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('wheel', (event) => event.preventDefault(), { passive: false });
+      (() => {
+        const pokiHost = /(^|\.)poki\.(com|dev)$/.test(location.hostname);
+        const params = new URLSearchParams(location.search);
+        const explicitMock = params.get('mockAds') === '1';
+        const explicitReal = params.get('mockAds') === '0';
+        const forceMock = explicitMock || (!pokiHost && !explicitReal);
+        if (forceMock || window.PokiSDK) return;
+        const sdk = document.createElement('script');
+        sdk.src = 'https://game-cdn.poki.com/scripts/v2/poki-sdk.js';
+        sdk.async = true;
+        document.head.appendChild(sdk);
+      })();
+    </script>
+    <script src="vendor/phaser.min.js"></script>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

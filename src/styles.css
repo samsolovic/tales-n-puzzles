@@ -1,0 +1,198 @@
+:root {
+  --ink: #101a24;
+  --ink-soft: #1b2b36;
+  --paper: #f2e7d2;
+  --paper-dim: #cdbfa6;
+  --gold: #d5a85a;
+  --gold-bright: #f0cd85;
+  --rust: #a5503e;
+  --sea: #2d6770;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+body {
+  overflow: hidden;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 22% 8%, rgba(80, 116, 118, 0.2), transparent 35%),
+    radial-gradient(circle at 84% 88%, rgba(154, 86, 52, 0.13), transparent 38%),
+    linear-gradient(135deg, #0c141c, #101c25 48%, #0b131a);
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+#app::after {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  content: "";
+  pointer-events: none;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+#game {
+  position: absolute;
+  inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  display: grid;
+  place-items: center;
+}
+
+#game canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.48);
+}
+
+#boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(45, 103, 112, 0.28), transparent 38%),
+    #101a24;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+
+#boot-screen.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.boot-mark {
+  position: relative;
+  width: 76px;
+  height: 58px;
+  margin-bottom: 30px;
+}
+
+.boot-mark span {
+  position: absolute;
+  top: 0;
+  width: 35px;
+  height: 56px;
+  border: 1px solid rgba(213, 168, 90, 0.75);
+  background: linear-gradient(180deg, rgba(240, 205, 133, 0.14), rgba(16, 26, 36, 0.2));
+}
+
+.boot-mark span:first-child {
+  left: 1px;
+  border-radius: 5px 1px 1px 5px;
+  transform: skewY(7deg);
+}
+
+.boot-mark span:last-child {
+  right: 1px;
+  border-radius: 1px 5px 5px 1px;
+  transform: skewY(-7deg);
+}
+
+.boot-mark::after {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 1px;
+  height: 48px;
+  content: "";
+  background: var(--gold);
+  transform: translateX(-50%);
+}
+
+.boot-eyebrow {
+  margin: 0 0 14px;
+  color: var(--gold);
+  font-family: Baskerville, Georgia, serif;
+  font-size: 10px;
+  letter-spacing: 0.34em;
+}
+
+#boot-screen h1 {
+  margin: 0;
+  font-family: Baskerville, "Iowan Old Style", Georgia, serif;
+  font-size: clamp(38px, 6vw, 78px);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1;
+}
+
+#boot-screen h1 em {
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.boot-status {
+  margin: 26px 0 0;
+  color: rgba(242, 231, 210, 0.52);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+}
+
+#reframing {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  color: rgba(242, 231, 210, 0.8);
+  background: rgba(11, 23, 32, 0.94);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+#reframing.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

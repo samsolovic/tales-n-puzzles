@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+  <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="22"/>
+  </filter>
+  <filter id="tinyGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="7"/>
+  </filter>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch" seed="7"/>
+    <feColorMatrix type="saturate" values="0"/>
+    <feComponentTransfer><feFuncA type="linear" slope=".3"/></feComponentTransfer>
+  </filter>
+  <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="blur5"><feGaussianBlur stdDeviation="5"/></filter>
+  <radialGradient id="vignette" cx="50%" cy="46%" r="72%">
+    <stop offset="48%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#02090d" stop-opacity=".58"/>
+  </radialGradient>
+  <linearGradient id="sailGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#f3e6c9"/>
+    <stop offset=".52" stop-color="#ddc9a5"/>
+    <stop offset="1" stop-color="#c3ad88"/>
+  </linearGradient>
+  <linearGradient id="paperWash" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f3e4c5" stop-opacity=".12"/>
+    <stop offset=".5" stop-color="#d5a85a" stop-opacity=".04"/>
+    <stop offset="1" stop-color="#0d1d26" stop-opacity=".12"/>
+  </linearGradient>
+</defs>
+  
+  <g transform="translate(1000 718)">
+    <path d="M-76 18 Q-92 -26 -46 -42 Q-10 -64 28 -40 Q74 -48 82 -2 Q94 40 44 42 Q0 62 -42 42 Q-72 40 -76 18Z" fill="#d9cbb1" stroke="#0b1720" stroke-opacity=".22" stroke-width="2"/>
+    <path d="M-54 -8 q24 -26 58 -10 q-6 34 -44 34 q-28 0 -14 -24Z" fill="#c6b596" opacity=".7"/>
+    <path d="M-42 18 q28 12 64 -4" stroke="#c5aa7c" stroke-width="2" fill="none" opacity=".6"/>
+    <path d="M-30 -30 q8 -18 20 -20 M30 -32 q12 -18 24 -12" stroke="#b9a98e" stroke-width="3" fill="none" opacity=".6"/>
+  </g>
+  
+  
+  
+  
+</svg>
