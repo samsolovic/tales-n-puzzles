@@ -100,6 +100,36 @@ Do not add ads, sharing, cloud save or the full story yet.
 4. Add the WeChat reward-ad adapter and test with a real ad unit only after Traffic Master is available.
 5. Then expand to five chapters.
 
+## Three-act chapter prototype
+
+The first real chapter flow is now implemented:
+
+```text
+Title
+→ Chapter card: 精卫填海
+→ Act 1 card: 炎帝之少女
+→ 2 story pages
+→ 5-target search
+→ 山海小笺
+→ Act 2 card: 溺而不返
+→ 2 story pages
+→ 5-target search
+→ 山海小笺
+→ Act 3 card: 衔木石以堙东海
+→ 2 story pages
+→ 5-target search
+→ 山海小笺
+→ 篇末山海小笺
+```
+
+Verified in the Cocos web-mobile build at 390 × 844. All three acts complete, auto cards work, the 5/5 completion timer advances, and the final knowledge card opens.
+
+Current art is deliberately placeholder: simple sea, mountains, bird, and target markers. Final Jingwei artwork is the next production step.
+
+![Jingwei act 1](jingwei-act1-story.png)
+
+![Jingwei ending](jingwei-ending.png)
+
 ## Current machine status
 
 Installed and verified:
