@@ -44,6 +44,60 @@ shaonv-character.jpg
 
 精卫可以保持 `jingwei-character.jpg`。
 
+## V2 评审
+
+### 精卫 v2
+
+![精卫 v2](jingwei-character-v2.jpg)
+
+**结论：可以锁定为精卫基准。**
+
+相比 v1：
+
+- 文首纹样终于清楚了
+- 白喙、红足、黑羽、衔枝四点都在
+- 体态更像神鸟，不像普通乌鸦
+
+**唯一要调的是：**
+
+- v2 的头顶纹样偏白、偏“蕾丝冠”，在手机上看会有点像装饰帽。
+- 下一张飞行姿态里，把纹样改成**淡金/石青**的细纹，不要纯白蕾丝。
+- 保留现在的白喙、红足、黑羽和眼睛。
+
+### 女娃 v2
+
+![女娃 v2](nvwa-character-v2.jpg)
+
+**结论：变化不够，暂时不要拿去生成第一幕主图。**
+
+v2 主要是发髻更高、披帛更长，但：
+
+- 脸还是 10–11 岁的孩童感
+- 身体比例还是偏小孩
+- 还是静态正面三分之四，没有“望向东海”的动作
+- 表情还是安静，不够“炎帝之少女”的坚定
+
+如果我们要的是“少女”，还需要一版 v3。  
+如果接受更幼态的女娃，v2 可以用，但三幕主图都会跟着偏童书。
+
+### 女娃 v3 Prompt
+
+```text
+Same character reference: the youngest daughter of the Fire Emperor. Ancient Chinese girl, 15 years old, late-teen proportions (about 7.5 heads tall), longer oval face, less round cheeks, defined jaw, calm resolute eyes, no makeup. Same blue cross-collar robe, ochre shawl, simple jade hairpin, barefoot. Three-quarter side view, body turned toward the East Sea, face in profile, wind lifting the shawl and hair. Standing on a rocky shore at dusk. Full body. Chinese mythological storybook illustration, mineral pigment on silk, fine ink linework, muted azurite and ochre palette. No text, no watermark, no anime, no 3D render, no childlike doll face, no sexualization.
+```
+
+负面词里加上：
+
+```text
+child, toddler, baby face, round cheeks, chibi, doll, makeup, jewelry, modern clothing, anime, 3D, text, watermark
+```
+
+### 精卫飞行姿态 Prompt
+
+```text
+Same bird reference as jingwei-character-v2: black crow-like mythical bird, patterned crown in pale gold and stone blue (not white lace), bright white beak, cinnabar red feet, holding a small zebrawood branch. Wings fully spread, rising from a stormy East Sea, dynamic flight pose, visible chest and tail. Chinese mythological storybook illustration, mineral pigment on silk, fine ink linework, cold ink-black and deep teal palette with white and cinnabar accents. 9:16, top 15% and bottom 22% simple for UI. No text, no watermark, no anime, no 3D render.
+```
+
 ## 当前图片
 
 ![女娃角色设定](nvwa-character.jpg)
