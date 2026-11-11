@@ -120,12 +120,27 @@ Validation performed:
 - `sys.localStorage` survives the write; value is `found`
 - No missing-class or runtime errors after the scene class ID fix
 
+Real-device run (Android, WeChat base library 3.18.0):
+
+- Cocos Creator 3.8.8 launched successfully
+- Scene loaded: `db://assets/scenes/Spike.scene`
+- Visible design size: 750 × 1666
+- Lotus artwork loaded from the resources bundle
+- Eye target taps logged 13 times in a row
+- No missing-class, JavaScript exception, or scene-load failure
+
+Non-blocking warnings in the device log:
+
+- `Failed to set shading scale, pipelineSceneData is invalid` — Cocos legacy-pipeline warning from the trimmed 2D build; rendering continues.
+- `Read json failed: ... cacheList.json` — first-launch asset cache file is absent; normal.
+- `webapi_game_transfer -31001` / `getUserGrantInfo fail` — WeChat's game-transfer/benefit service, not this game's code.
+- `preload traffic expt` — WeChat ad-system experiment plumbing; no ad SDK is used in the spike yet.
+
 Still pending:
 
-- Open `build/wechatgame` in WeChat DevTools
-- Scan the preview QR on a real phone
-- Confirm WeChat DevTools compiles the Cocos bundle without errors
-- Check the test account / real AppID behavior
+- Confirm storage after a full close and reopen (the first log only covers the initial run)
+- Test on iOS
+- Replace the debug build with a release build before submission
 
 The first build exposed two Cocos-specific issues that are now fixed:
 
