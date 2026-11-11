@@ -136,9 +136,32 @@ Non-blocking warnings in the device log:
 - `webapi_game_transfer -31001` / `getUserGrantInfo fail` — WeChat's game-transfer/benefit service, not this game's code.
 - `preload traffic expt` — WeChat ad-system experiment plumbing; no ad SDK is used in the spike yet.
 
+## Storage finding
+
+Two Android sessions were compared:
+
+- `console-1794377232187.log` — first session, 13 eye taps
+- `console-1794377864410.log` — second session, 19 eye taps
+
+Both logged `previous: ""` at startup. Core touch and image loading still worked, but `sys.localStorage` did not provide a reliable readback across debug sessions.
+
+The spike now uses the native WeChat API explicitly:
+
+```ts
+wx.setStorageSync(STORAGE_KEY, 'found');
+wx.getStorageSync(STORAGE_KEY);
+```
+
+It falls back to `sys.localStorage` only when `wx` is unavailable (web preview). New log lines:
+
+```text
+[Spike] wx storage write found
+[Spike] Cocos WeChat validation started { previous: "found", ... }
+```
+
 Still pending:
 
-- Confirm storage after a full close and reopen (the first log only covers the initial run)
+- Re-run the WeChat build and confirm `previous: "found"` after a full close/reopen
 - Test on iOS
 - Replace the debug build with a release build before submission
 

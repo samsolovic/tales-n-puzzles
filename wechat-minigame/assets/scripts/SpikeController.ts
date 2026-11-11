@@ -40,7 +40,7 @@ export class SpikeController extends Component {
   }
 
   start() {
-    const previous = sys.localStorage.getItem(STORAGE_KEY);
+    const previous = this.readStorage();
     this.buildBackground();
     this.buildHeader(previous === 'found');
     this.buildCard();
@@ -48,10 +48,38 @@ export class SpikeController extends Component {
     this.buildFooter();
 
     console.log('[Spike] Cocos WeChat validation started', {
+      previous,
       width: view.getVisibleSize().width,
       height: view.getVisibleSize().height,
-      previous,
     });
+  }
+
+  private readStorage(): string {
+    try {
+      const wxApi = (globalThis as any).wx;
+      if (wxApi && typeof wxApi.getStorageSync === 'function') {
+        return wxApi.getStorageSync(STORAGE_KEY) || '';
+      }
+      return sys.localStorage.getItem(STORAGE_KEY) || '';
+    } catch (error) {
+      console.warn('[Spike] storage read failed', error);
+      return '';
+    }
+  }
+
+  private writeStorage(value: string) {
+    try {
+      const wxApi = (globalThis as any).wx;
+      if (wxApi && typeof wxApi.setStorageSync === 'function') {
+        wxApi.setStorageSync(STORAGE_KEY, value);
+        console.log('[Spike] wx storage write', this.readStorage());
+        return;
+      }
+      sys.localStorage.setItem(STORAGE_KEY, value);
+      console.log('[Spike] localStorage write', this.readStorage());
+    } catch (error) {
+      console.warn('[Spike] storage write failed', error);
+    }
   }
 
   private makeNode(name: string, width: number, height: number): Node {
@@ -200,7 +228,7 @@ export class SpikeController extends Component {
 
   private onEyeTap() {
     this.found += 1;
-    sys.localStorage.setItem(STORAGE_KEY, 'found');
+    this.writeStorage('found');
     this.status.string = `找到了！第 ${this.found} 次点击，已写入存档`;
     console.log('[Spike] eye tapped', this.found);
 
