@@ -143,7 +143,17 @@ Two Android sessions were compared:
 - `console-1794377232187.log` — first session, 13 eye taps
 - `console-1794377864410.log` — second session, 19 eye taps
 
-Both logged `previous: ""` at startup. Core touch and image loading still worked, but `sys.localStorage` did not provide a reliable readback across debug sessions.
+The first two sessions logged `previous: ""` at startup. Core touch and image loading still worked, but `sys.localStorage` did not provide a reliable readback across debug sessions.
+
+The third session (`console-1794379241000.log`, 14:40) was built with the native API and logged:
+
+```text
+[Spike] Cocos WeChat validation started {previous: "", ...}
+[Spike] wx storage write found
+[Spike] eye tapped 1
+```
+
+The native write/readback works inside the session. The startup value was still empty because that run began before any tap; a separate close/reopen session is still needed to verify cross-session persistence.
 
 The spike now uses the native WeChat API explicitly:
 
