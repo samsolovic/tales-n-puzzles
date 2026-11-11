@@ -158,7 +158,7 @@ export class SpikeController extends Component {
       if (!info || !info.safeArea || !info.windowWidth) return 0;
       const scale = view.getVisibleSize().width / info.windowWidth;
       const inset = (info.windowHeight - info.safeArea.bottom) * scale;
-      const safeBottom = Math.max(0, inset + 36);
+      const safeBottom = Math.max(112, inset + 36);
       console.log('[Jingwei] safe bottom', { safeBottom, inset, safeArea: info.safeArea });
       return safeBottom;
     } catch (error) {
