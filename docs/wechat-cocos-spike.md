@@ -153,7 +153,9 @@ The third session (`console-1794379241000.log`, 14:40) was built with the native
 [Spike] eye tapped 1
 ```
 
-The native write/readback works inside the session. The startup value was still empty because that run began before any tap; a separate close/reopen session is still needed to verify cross-session persistence.
+The native write/readback works inside the session. A follow-up phone screenshot showed `上次已找到，再点一次试试`, which means `previous === "found"` on a later launch; cross-session persistence is confirmed.
+
+The phone screenshot also exposed the WeChat capsule overlapping the centered title. The spike now reads `wx.getMenuButtonBoundingClientRect()` (with `getWindowInfo`/`getSystemInfoSync`) and shifts the header and card below the capsule. It also lifts the footer above the bottom system UI. The device log now includes a `[Spike] safe top` entry.
 
 The spike now uses the native WeChat API explicitly:
 

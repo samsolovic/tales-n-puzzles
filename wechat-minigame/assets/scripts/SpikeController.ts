@@ -34,12 +34,14 @@ export class SpikeController extends Component {
   private eyeNode!: Node;
   private found = 0;
   private cardY = 0;
+  private safeTop = 0;
 
   onLoad() {
     view.setDesignResolutionSize(750, 1334, ResolutionPolicy.FIXED_WIDTH);
   }
 
   start() {
+    this.safeTop = this.getSafeTop();
     const previous = this.readStorage();
     this.buildBackground();
     this.buildHeader(previous === 'found');
@@ -51,7 +53,29 @@ export class SpikeController extends Component {
       previous,
       width: view.getVisibleSize().width,
       height: view.getVisibleSize().height,
+      safeTop: this.safeTop,
     });
+  }
+
+  private getSafeTop(): number {
+    const wxApi = (globalThis as any).wx;
+    if (!wxApi) return 0;
+    try {
+      const info = wxApi.getWindowInfo
+        ? wxApi.getWindowInfo()
+        : (wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : null);
+      const rect = wxApi.getMenuButtonBoundingClientRect
+        ? wxApi.getMenuButtonBoundingClientRect()
+        : null;
+      if (!info || !rect || !info.windowWidth) return 0;
+      const scale = view.getVisibleSize().width / info.windowWidth;
+      const safeTop = Math.max(0, rect.bottom * scale + 8);
+      console.log('[Spike] safe top', { safeTop, scale, rect, windowWidth: info.windowWidth });
+      return safeTop;
+    } catch (error) {
+      console.warn('[Spike] safe area failed', error);
+      return 0;
+    }
   }
 
   private readStorage(): string {
@@ -110,8 +134,9 @@ export class SpikeController extends Component {
 
   private buildHeader(alreadyFound: boolean) {
     const top = view.getVisibleSize().height / 2;
+    const shift = this.safeTop;
     const eyebrowNode = this.makeNode('Eyebrow', 700, 40);
-    eyebrowNode.setPosition(0, top - 40);
+    eyebrowNode.setPosition(0, top - shift - 40);
     const eyebrow = eyebrowNode.addComponent(Label);
     eyebrow.string = 'COCOS × WECHAT · VALIDATION';
     eyebrow.fontSize = 18;
@@ -120,7 +145,7 @@ export class SpikeController extends Component {
     eyebrow.horizontalAlign = Label.HorizontalAlign.CENTER;
 
     const titleNode = this.makeNode('Title', 700, 110);
-    titleNode.setPosition(0, top - 130);
+    titleNode.setPosition(0, top - shift - 130);
     const title = titleNode.addComponent(Label);
     title.string = '解谜涨知识';
     title.fontSize = 68;
@@ -129,7 +154,7 @@ export class SpikeController extends Component {
     title.horizontalAlign = Label.HorizontalAlign.CENTER;
 
     const subNode = this.makeNode('Subtitle', 700, 50);
-    subNode.setPosition(0, top - 210);
+    subNode.setPosition(0, top - shift - 210);
     const sub = subNode.addComponent(Label);
     sub.string = '之 · 山海经';
     sub.fontSize = 32;
@@ -138,7 +163,7 @@ export class SpikeController extends Component {
     sub.horizontalAlign = Label.HorizontalAlign.CENTER;
 
     const hintNode = this.makeNode('Hint', 700, 44);
-    hintNode.setPosition(0, top - 255);
+    hintNode.setPosition(0, top - shift - 255);
     const hint = hintNode.addComponent(Label);
     hint.string = alreadyFound ? '上次已找到，再点一次试试' : '找到画面里的眼睛';
     hint.fontSize = 22;
@@ -149,7 +174,7 @@ export class SpikeController extends Component {
 
   private buildCard() {
     const top = view.getVisibleSize().height / 2;
-    this.cardY = top - 650;
+    this.cardY = top - this.safeTop - 650;
     const card = this.makeNode('Card', 650, 700);
     card.setPosition(0, this.cardY);
     const g = card.addComponent(Graphics);
@@ -217,7 +242,7 @@ export class SpikeController extends Component {
   private buildFooter() {
     const h = view.getVisibleSize().height;
     const footerNode = this.makeNode('Footer', 700, 60);
-    footerNode.setPosition(0, -h / 2 + 50);
+    footerNode.setPosition(0, -h / 2 + 90);
     const footer = footerNode.addComponent(Label);
     footer.string = 'Cocos Creator 3.8.8 · 微信小游戏测试号';
     footer.fontSize = 18;
