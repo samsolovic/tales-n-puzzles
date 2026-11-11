@@ -98,6 +98,46 @@ child, toddler, baby face, round cheeks, chibi, doll, makeup, jewelry, modern cl
 Same bird reference as jingwei-character-v2: black crow-like mythical bird, patterned crown in pale gold and stone blue (not white lace), bright white beak, cinnabar red feet, holding a small zebrawood branch. Wings fully spread, rising from a stormy East Sea, dynamic flight pose, visible chest and tail. Chinese mythological storybook illustration, mineral pigment on silk, fine ink linework, cold ink-black and deep teal palette with white and cinnabar accents. 9:16, top 15% and bottom 22% simple for UI. No text, no watermark, no anime, no 3D render.
 ```
 
+## 女娃 v3：通过
+
+![女娃 v3](nvwa-character-v3.jpg)
+
+这一版可以锁定为女娃基准。
+
+- 年龄终于到了 15 岁左右，不再是 10–11 岁
+- 侧脸望海，有明确动作
+- 风吹披帛和长发，画面有方向
+- 青蓝衣、赭色披帛、玉簪、赤足都保留
+- 表情安静但有决定感
+- 和精卫 v2 的绢本/矿物色风格一致
+
+**注意：v3 已经不是角色设定图，而是一张故事主图。**
+
+它可以直接作为第一幕剧情/情绪参考，但还不是寻物背景，因为：
+
+- 画面是 1:1，不是 9:16
+- 没有小舟、贝壳、玉佩、柘叶、海鸟五个目标
+- 没有布/石头两个遮挡物
+- 夕阳偏橙粉，和 UI 的石青/淡金需要再统一
+- 头顶接近画面上方，9:16 裁切时要给微信胶囊留空间
+
+所以不要再画女娃角色 v4。  
+下一步应该用 v3 作为角色和风格参考，生成 **9:16 第一幕主图/寻物底板**。
+
+### 第一幕 9:16 主图 Prompt
+
+```text
+Use the provided image as exact character and style reference. The same 15-year-old ancient Chinese girl, same face, same blue cross-collar robe, ochre shawl, jade hairpin, barefoot. Vertical 9:16 Chinese mythological storybook illustration. She stands smaller on the left side of a rocky shore at dusk, seen in three-quarter profile, looking at the East Sea, wind lifting the shawl. A small wooden boat is moored on the left. Distant Mount Fajiu on the horizon. Pale moon in the upper right. Foreground across the lower half: zebrawood leaves, shells, reeds, a jade pendant resting on a piece of cloth, a seabird on a rock. The foreground is arranged so five small objects are findable but not obvious. Keep the girl's head below the top 15% UI safe zone and keep the bottom 22% free of critical objects. Mineral pigment on silk, fine ink linework, muted azurite, malachite, ochre and pale gold, less orange sunset, more stone-blue dusk. No text, no watermark, no logo, no modern objects, no anime, no 3D render.
+```
+
+### 寻物目标位置
+
+- 左前景：小舟
+- 左下：柘叶
+- 中前景：贝壳（石头遮挡）
+- 右中：玉佩（布遮挡）
+- 右礁石：海鸟
+
 ## 当前图片
 
 ![女娃角色设定](nvwa-character.jpg)
