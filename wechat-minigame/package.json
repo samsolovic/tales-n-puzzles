@@ -1,0 +1,10 @@
+{
+  "name": "gushi-youmi-wechat",
+  "version": "0.0.1",
+  "private": true,
+  "description": "故事有谜 - WeChat Mini Game Cocos validation spike",
+  "creator": {
+    "version": "3.8.8"
+  },
+  "uuid": "9fa62dd1-8648-45b2-b38e-961821e008ba"
+}

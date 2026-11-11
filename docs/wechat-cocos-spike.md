@@ -51,14 +51,14 @@ Filing is slow: platform review is typically 1–2 working days, and the authori
 
 Use a separate project folder, not the existing Phaser app.
 
-Suggested path:
+Actual path:
 
 ```text
 wechat-minigame/
   assets/
+    resources/spike.jpg
     scenes/Spike.scene
     scripts/SpikeController.ts
-    textures/
   settings/
   package.json
 ```
@@ -100,4 +100,32 @@ Do not add ads, sharing, cloud save or the full story yet.
 
 ## Current machine status
 
-Cocos Creator and WeChat DevTools are not installed in this workspace yet. Install both before creating the Cocos project.
+Installed and verified:
+
+- Cocos Creator **3.8.8** at `/Applications/Cocos/Creator/3.8.8`
+- WeChat DevTools at `/Applications/wechatwebdevtools.app`
+- Cocos project: `wechat-minigame/`
+- WeChat build: `wechat-minigame/build/wechatgame/`
+- Cocos AppID set to `wx9f31155e9d70c411`
+- 2D-only engine trim: **3.5 MB** main package
+
+Validation performed:
+
+- Cocos web-mobile build runs at 390 × 844
+- Chinese title and body render correctly
+- Clean lotus artwork loads from the `resources` bundle
+- Eye target receives touch and updates the status label
+- `sys.localStorage` survives the write; value is `found`
+- No missing-class or runtime errors after the scene class ID fix
+
+Still pending:
+
+- Open `build/wechatgame` in WeChat DevTools
+- Scan the preview QR on a real phone
+- Confirm WeChat DevTools compiles the Cocos bundle without errors
+- Check the test account / real AppID behavior
+
+The first build exposed two Cocos-specific issues that are now fixed:
+
+1. The scene must reference the compiler-generated class ID `3f2a1tMXW5PcIqbDB0uP0pb`, not the ordinary compressed asset UUID.
+2. The image is a `Texture2D` subasset; load `spike/texture` and create a `SpriteFrame` at runtime.

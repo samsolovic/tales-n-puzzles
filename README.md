@@ -117,6 +117,10 @@ Implemented flows:
 
 The full event map, local test matrix and Poki QA checklist live in [docs/poki-spike.md](docs/poki-spike.md). Upload copy and registration steps are in [docs/poki-submission.md](docs/poki-submission.md).
 
+## WeChat Mini Game
+
+A Cocos Creator 3.8 validation project lives in `wechat-minigame/`, with a 2D-only WeChat build and a browser-verified touch/storage spike. See [docs/wechat-cocos-spike.md](docs/wechat-cocos-spike.md).
+
 The adapter is deliberately raw-SDK based rather than using `@poki/phaser-3`: this game has no bundler and uses multiple scenes (Title, Map, Story, Spot, Hidden, UnitEnd), so manual event boundaries are clearer than a single `gameplaySceneKey`. The official Phaser plugin remains a good option if the project later adds a bundler.
 
 This has not yet been submitted to Poki. The next validation step is to upload a zip to the [Poki Inspector](https://inspector.poki.dev/) and confirm the event stream, ad fill, mobile/portrait behaviour, and the 16:9 requirement on the platform.
