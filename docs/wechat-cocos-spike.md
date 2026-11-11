@@ -173,7 +173,7 @@ It falls back to `sys.localStorage` only when `wx` is unavailable (web preview).
 
 Still pending:
 
-- Re-run the WeChat build and confirm `previous: "found"` after a full close/reopen
+- Re-run the WeChat build visually and confirm the title/card now sit below the capsule
 - Test on iOS
 - Replace the debug build with a release build before submission
 
