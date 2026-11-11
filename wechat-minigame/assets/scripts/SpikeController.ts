@@ -30,15 +30,27 @@ const PROGRESS_KEY = 'jiemi-jingwei-progress-v1';
 interface PuzzleTarget {
   id: string;
   name: string;
+  icon: string;
   x: number;
   y: number;
   hint: string;
+  cover?: string;
+}
+
+interface Cover {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  kind: string;
 }
 
 interface Puzzle {
   type: string;
   prompt: string;
   targets: PuzzleTarget[];
+  covers?: Cover[];
 }
 
 interface Act {
@@ -66,7 +78,10 @@ export class SpikeController extends Component {
   private actIndex = 0;
   private pageIndex = 0;
   private foundIds = new Set<string>();
-  private targetNodes: Node[] = [];
+  private targetNodes = new Map<string, Node>();
+  private pillLabels = new Map<string, Label>();
+  private coverNodes = new Map<string, Node>();
+  private coversOpened = new Set<string>();
   private hintLeft = 3;
   private foundCount = 0;
   private progressAct = 0;
@@ -169,7 +184,10 @@ export class SpikeController extends Component {
     this.hintText = null;
     this.hintButtonLabel = null;
     this.progressLabel = null;
-    this.targetNodes = [];
+    this.targetNodes.clear();
+    this.pillLabels.clear();
+    this.coverNodes.clear();
+    this.coversOpened.clear();
     this.foundIds.clear();
     this.foundCount = 0;
     this.hintLeft = 3;
@@ -211,7 +229,7 @@ export class SpikeController extends Component {
     g.strokeColor = primary ? new Color(255, 229, 166, 180) : new Color(213, 168, 90, 120);
     g.roundRect(-w / 2, -h / 2, w, h, 8);
     g.stroke();
-    const l = this.label(text, 0, 0, 24, primary ? INK : PAPER, w - 30);
+    const l = this.label(text, 0, 0, 28, primary ? INK : PAPER, w - 30);
     l.node.removeFromParent();
     n.addChild(l.node);
     l.node.setPosition(0, 0);
@@ -325,8 +343,8 @@ export class SpikeController extends Component {
   private header(kicker: string, title: string) {
     const top = view.getVisibleSize().height / 2;
     const y = top - this.safeTop;
-    this.label(kicker, 0, y - 42, 17, GOLD, 680);
-    this.label(title, 0, y - 104, 31, PAPER, 680);
+    this.label(kicker, 0, y - 44, 19, GOLD, 680);
+    this.label(title, 0, y - 110, 36, PAPER, 680);
   }
 
   private showLoading() {
@@ -348,10 +366,9 @@ export class SpikeController extends Component {
     this.drawScene(0, 'title');
     const top = view.getVisibleSize().height / 2;
     const shift = this.safeTop;
-    this.label('COCOS × WECHAT · 山海经', 0, top - shift - 80, 16, GOLD);
-    this.label('解谜涨知识', 0, top - shift - 180, 66, PAPER);
-    this.label('之 · 山海经', 0, top - shift - 255, 30, GOLD);
-    this.label('读故事 · 寻线索 · 收小笺', 0, top - shift - 320, 20, MUTED);
+    this.label('解谜涨知识', 0, top - shift - 170, 72, PAPER);
+    this.label('之 · 山海经', 0, top - shift - 250, 34, GOLD);
+    this.label('读故事 · 寻线索 · 收小笺', 0, top - shift - 315, 24, MUTED);
 
     const label = this.progressAct >= 3 ? '再读一遍 · 精卫填海' : (this.progressAct > 0 ? '继续 · 精卫填海' : '开始 · 精卫填海');
     this.button(label, 0, -view.getVisibleSize().height / 2 + 155, 560, 86, () => {
@@ -362,25 +379,25 @@ export class SpikeController extends Component {
       }
     }, true);
 
-    this.label('每章三幕 · 一幕一谜 · 篇末一张山海小笺', 0, -view.getVisibleSize().height / 2 + 70, 15, MUTED);
+    this.label('每章三幕 · 一幕一谜 · 篇末一张山海小笺', 0, -view.getVisibleSize().height / 2 + 70, 17, MUTED);
   }
 
   private showChapterCard() {
     this.clearView();
     this.drawScene(0, 'blank');
     const h = view.getVisibleSize().height;
-    this.label('第 一 篇', 0, 220, 18, GOLD);
-    this.label('精卫填海', 0, 80, 52, PAPER);
-    this.label('炎帝之少女，溺而不返，化为精卫。', 0, -10, 20, MUTED, 620);
-    this.label('三幕 · 三个谜 · 一张山海小笺', 0, -70, 16, GOLD);
-    this.label('点击继续', 0, -h / 2 + 90, 16, MUTED);
+    this.label('第 一 篇', 0, 220, 20, GOLD);
+    this.label('精卫填海', 0, 80, 60, PAPER);
+    this.label('炎帝之少女，溺而不返，化为精卫。', 0, -20, 24, MUTED, 620);
+    this.label('三幕 · 三个谜 · 一张山海小笺', 0, -85, 18, GOLD);
+    this.label('点击继续', 0, -h / 2 + 90, 18, MUTED);
 
     const skip = this.uiNode('Skip', 750, h);
     skip.on(Node.EventType.TOUCH_END, () => {
       this.clearAuto();
       this.showActCard(0);
     }, this);
-    this.setAuto(() => this.showActCard(0), 1800);
+    this.setAuto(() => this.showActCard(0), 3000);
   }
 
   private showActCard(index: number) {
@@ -394,16 +411,16 @@ export class SpikeController extends Component {
     this.clearView();
     this.drawScene(index, 'blank');
     const act = this.chapter.acts[index];
-    this.label(act.kicker, 0, 190, 18, GOLD);
-    this.label(act.title, 0, 80, 40, PAPER, 680);
-    this.label('点击继续', 0, -view.getVisibleSize().height / 2 + 90, 16, MUTED);
+    this.label(act.kicker, 0, 190, 20, GOLD);
+    this.label(act.title, 0, 80, 48, PAPER, 680);
+    this.label('点击继续', 0, -view.getVisibleSize().height / 2 + 90, 18, MUTED);
 
     const skip = this.uiNode('Skip', 750, view.getVisibleSize().height);
     skip.on(Node.EventType.TOUCH_END, () => {
       this.clearAuto();
       this.showStory(index, 0);
     }, this);
-    this.setAuto(() => this.showStory(index, 0), 1500);
+    this.setAuto(() => this.showStory(index, 0), 2400);
   }
 
   private showStory(actIndex: number, pageIndex: number) {
@@ -420,10 +437,10 @@ export class SpikeController extends Component {
     this.header(act.kicker, act.title);
 
     const h = view.getVisibleSize().height;
-    const panelY = -h / 2 + 300;
-    this.panel(0, panelY, 650, 390);
-    this.label(act.pages[pageIndex], 0, panelY + 30, 25, PAPER, 590);
-    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, panelY - 140, 15, MUTED);
+    const panelY = -h / 2 + 330;
+    this.panel(0, panelY, 660, 440);
+    this.label(act.pages[pageIndex], 0, panelY + 35, 32, PAPER, 590, 250);
+    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, panelY - 155, 20, MUTED);
     this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, -h / 2 + 105, 540, 82, () => {
       this.showStory(actIndex, pageIndex + 1);
     });
@@ -443,48 +460,315 @@ export class SpikeController extends Component {
     const h = view.getVisibleSize().height;
     const top = h / 2;
     const bottom = -h / 2;
-    const areaBottom = bottom + 255;
-    const areaTop = top - this.safeTop - 175;
+    const areaBottom = bottom + 355;
+    const areaTop = top - this.safeTop - 190;
 
-    this.label(act.puzzle.prompt, 0, top - this.safeTop - 165, 20, PAPER, 650);
-    this.hintText = this.label('', 0, bottom + 190, 17, GOLD, 690);
-    this.progressLabel = this.label(`0 / ${act.puzzle.targets.length}`, 0, bottom + 235, 18, GOLD, 300);
+    this.label(act.puzzle.prompt, 0, top - this.safeTop - 170, 26, PAPER, 650);
+    this.progressLabel = null;
+    this.hintText = this.label('', 0, bottom + 300, 21, GOLD, 690);
 
     for (const target of act.puzzle.targets) {
       const px = -330 + target.x * 660;
       const py = areaBottom + target.y * (areaTop - areaBottom);
       const n = this.uiNode(`target-${target.id}`, 110, 110);
       n.setPosition(px, py);
+      n.setScale(1.12, 1.12, 1);
       const g = n.addComponent(Graphics);
-      g.fillColor = new Color(243, 230, 201, 220);
-      g.circle(0, 0, 22);
-      g.fill();
-      g.lineWidth = 2;
-      g.strokeColor = GOLD;
-      g.circle(0, 0, 22);
-      g.stroke();
-      const l = this.label(target.name, 0, -38, 15, PAPER, 100);
-      l.node.removeFromParent();
-      n.addChild(l.node);
-      l.node.setPosition(0, -58);
+      this.drawIcon(g, target.icon);
+      n.active = !target.cover;
       n.on(Node.EventType.TOUCH_END, () => this.findTarget(target, n), this);
-      this.targetNodes.push(n);
+      this.targetNodes.set(target.id, n);
     }
 
-    const hintButton = this.button('提示 · 3', -160, bottom + 100, 260, 70, () => this.useHint(), false);
+    for (const cover of act.puzzle.covers || []) {
+      const px = -330 + cover.x * 660;
+      const py = areaBottom + cover.y * (areaTop - areaBottom);
+      const n = this.uiNode(`cover-${cover.id}`, cover.w, cover.h);
+      n.setPosition(px, py);
+      const g = n.addComponent(Graphics);
+      this.drawCover(g, cover);
+      n.on(Node.EventType.TOUCH_END, () => this.openCover(cover), this);
+      this.coverNodes.set(cover.id, n);
+    }
+
+    const pillW = 202;
+    const pillH = 58;
+    const row1Y = bottom + 235;
+    const row2Y = bottom + 165;
+    act.puzzle.targets.forEach((target, index) => {
+      let x = 0;
+      let y = row1Y;
+      if (index < 3) {
+        x = -220 + index * 220;
+      } else {
+        x = -110 + (index - 3) * 220;
+        y = row2Y;
+      }
+      this.makePill(target, x, y, pillW, pillH);
+    });
+
+    const hintButton = this.button('提示 · 3', -175, bottom + 72, 250, 64, () => this.useHint(), false);
     this.hintButtonLabel = hintButton.getComponentInChildren(Label);
-    this.label('找到所有线索即可继续', 170, bottom + 100, 15, MUTED, 330);
+    this.label('找到所有物品即可继续', 175, bottom + 72, 17, MUTED, 330);
+  }
+
+  private makePill(target: PuzzleTarget, x: number, y: number, w: number, h: number) {
+    const n = this.uiNode(`pill-${target.id}`, w, h);
+    n.setPosition(x, y);
+    const g = n.addComponent(Graphics);
+    g.fillColor = new Color(17, 35, 45, 255);
+    g.roundRect(-w / 2, -h / 2, w, h, 12);
+    g.fill();
+    g.lineWidth = 1;
+    g.strokeColor = new Color(213, 168, 90, 80);
+    g.roundRect(-w / 2, -h / 2, w, h, 12);
+    g.stroke();
+    const l = this.label(target.name, 0, 0, 22, PAPER, w - 20);
+    l.node.removeFromParent();
+    n.addChild(l.node);
+    l.node.setPosition(0, 0);
+    this.pillLabels.set(target.id, l);
+  }
+
+  private drawIcon(g: Graphics, icon: string) {
+    g.lineWidth = 3;
+    g.strokeColor = GOLD;
+    g.fillColor = PAPER;
+    switch (icon) {
+      case 'leaf':
+        g.ellipse(0, 0, 20, 10);
+        g.fill();
+        g.moveTo(-22, 0);
+        g.lineTo(22, 0);
+        g.stroke();
+        break;
+      case 'shell':
+        g.moveTo(0, 22);
+        g.lineTo(-24, -2);
+        g.lineTo(-14, -22);
+        g.lineTo(0, -15);
+        g.lineTo(14, -22);
+        g.lineTo(24, -2);
+        g.close();
+        g.fill();
+        for (let i = -2; i <= 2; i++) {
+          g.moveTo(0, 22);
+          g.lineTo(i * 10, -18);
+        }
+        g.stroke();
+        break;
+      case 'boat':
+        g.moveTo(-30, 8);
+        g.lineTo(30, 8);
+        g.lineTo(18, 23);
+        g.lineTo(-18, 23);
+        g.close();
+        g.fill();
+        g.moveTo(0, 8);
+        g.lineTo(0, -26);
+        g.lineTo(20, -10);
+        g.lineTo(0, -7);
+        g.stroke();
+        break;
+      case 'jade':
+        g.circle(0, 0, 18);
+        g.stroke();
+        g.circle(0, 0, 6);
+        g.stroke();
+        break;
+      case 'bird':
+        g.moveTo(-28, 6);
+        g.lineTo(-8, -8);
+        g.lineTo(0, 0);
+        g.lineTo(8, -8);
+        g.lineTo(28, 6);
+        g.stroke();
+        break;
+      case 'feather':
+        g.moveTo(-14, 20);
+        g.lineTo(10, -20);
+        g.stroke();
+        for (let i = -1; i <= 2; i++) {
+          g.moveTo(i * 6, i * -8 + 8);
+          g.lineTo(i * 6 - 10, i * -8 + 2);
+        }
+        g.stroke();
+        break;
+      case 'head':
+        g.circle(0, 0, 18);
+        g.fill();
+        g.moveTo(-10, 6);
+        g.lineTo(10, 6);
+        g.moveTo(-8, 12);
+        g.lineTo(8, 12);
+        g.stroke();
+        break;
+      case 'beak':
+        g.moveTo(-18, 0);
+        g.lineTo(20, -8);
+        g.lineTo(20, 8);
+        g.close();
+        g.fill();
+        break;
+      case 'foot':
+        g.moveTo(0, -16);
+        g.lineTo(0, 14);
+        g.moveTo(0, 14);
+        g.lineTo(-16, 22);
+        g.moveTo(0, 14);
+        g.lineTo(16, 22);
+        g.moveTo(-4, -18);
+        g.lineTo(4, -18);
+        g.stroke();
+        break;
+      case 'stone':
+        g.moveTo(-20, 12);
+        g.lineTo(-12, -12);
+        g.lineTo(10, -18);
+        g.lineTo(22, 0);
+        g.lineTo(12, 16);
+        g.close();
+        g.fill();
+        break;
+      case 'branch':
+        g.moveTo(-18, 18);
+        g.lineTo(18, -18);
+        g.moveTo(-2, -2);
+        g.lineTo(-14, -12);
+        g.moveTo(6, -8);
+        g.lineTo(16, -16);
+        g.stroke();
+        break;
+      case 'pine':
+        g.moveTo(0, 20);
+        g.lineTo(0, -20);
+        for (let i = -2; i <= 2; i++) {
+          g.moveTo(0, i * 7);
+          g.lineTo(i * 9, i * 7 - 9);
+        }
+        g.stroke();
+        break;
+      case 'white-stone':
+        g.fillColor = new Color(230, 224, 202, 255);
+        g.moveTo(-20, 12);
+        g.lineTo(-10, -14);
+        g.lineTo(14, -18);
+        g.lineTo(22, 4);
+        g.lineTo(8, 16);
+        g.close();
+        g.fill();
+        break;
+      case 'green-stone':
+        g.fillColor = new Color(76, 139, 135, 255);
+        g.moveTo(-22, 8);
+        g.lineTo(-8, -16);
+        g.lineTo(18, -10);
+        g.lineTo(20, 14);
+        g.lineTo(-4, 18);
+        g.close();
+        g.fill();
+        break;
+      case 'reed':
+        g.moveTo(0, 20);
+        g.lineTo(0, -18);
+        g.moveTo(0, 2);
+        g.lineTo(-14, -8);
+        g.moveTo(0, 8);
+        g.lineTo(14, -2);
+        g.stroke();
+        break;
+      default:
+        g.circle(0, 0, 18);
+        g.fill();
+    }
+  }
+
+  private drawCover(g: Graphics, cover: Cover) {
+    const w = cover.w;
+    const h = cover.h;
+    g.lineWidth = 2;
+    g.strokeColor = new Color(213, 168, 90, 150);
+    g.fillColor = new Color(22, 42, 49, 255);
+    if (cover.kind === 'rock') {
+      g.moveTo(-w / 2, h / 2);
+      g.lineTo(-w * 0.32, -h / 2);
+      g.lineTo(w * 0.15, -h * 0.4);
+      g.lineTo(w / 2, h * 0.1);
+      g.lineTo(w * 0.3, h / 2);
+      g.close();
+      g.fill();
+      g.stroke();
+    } else if (cover.kind === 'seaweed') {
+      for (let i = -2; i <= 2; i++) {
+        g.moveTo(i * 12, h / 2);
+        g.lineTo(i * 18, -h / 2);
+      }
+      g.stroke();
+    } else if (cover.kind === 'driftwood') {
+      g.moveTo(-w / 2, h / 3);
+      g.lineTo(w / 2, -h / 3);
+      g.moveTo(-w / 4, -h / 6);
+      g.lineTo(-w / 2, -h / 2);
+      g.stroke();
+    } else {
+      g.roundRect(-w / 2, -h / 2, w, h, 14);
+      g.fill();
+      g.stroke();
+      g.lineWidth = 1;
+      g.moveTo(-w / 2 + 16, -h / 4);
+      g.lineTo(w / 2 - 16, -h / 4);
+      g.stroke();
+    }
+    // A small non-text sparkle marks the cover as movable.
+    g.lineWidth = 2;
+    g.strokeColor = new Color(243, 230, 201, 200);
+    const sx = w / 2 - 14;
+    const sy = -h / 2 + 12;
+    g.moveTo(sx - 6, sy);
+    g.lineTo(sx + 6, sy);
+    g.moveTo(sx, sy - 6);
+    g.lineTo(sx, sy + 6);
+    g.stroke();
+    g.strokeColor = GOLD;
+    g.moveTo(-10, h / 2 - 10);
+    g.lineTo(0, h / 2 - 20);
+    g.lineTo(10, h / 2 - 10);
+    g.stroke();
+  }
+
+  private openCover(cover: Cover) {
+    if (this.coversOpened.has(cover.id)) return;
+    this.coversOpened.add(cover.id);
+    const target = this.chapter!.acts[this.actIndex].puzzle.targets.find((t) => t.cover === cover.id);
+    if (target) {
+      const targetNode = this.targetNodes.get(target.id);
+      if (targetNode) targetNode.active = true;
+    }
+    const coverNode = this.coverNodes.get(cover.id);
+    if (coverNode) {
+      tween(coverNode)
+        .to(0.22, { scale: new Vec3(0.86, 0.86, 1) })
+        .call(() => coverNode.destroy())
+        .start();
+    }
+    this.setHint('盖住它的东西移开了。');
   }
 
   private findTarget(target: PuzzleTarget, node: Node) {
     if (this.foundIds.has(target.id)) return;
+    if (target.cover && !this.coversOpened.has(target.cover)) return;
     this.foundIds.add(target.id);
     this.foundCount += 1;
     if (this.progressLabel) this.progressLabel.string = `${this.foundCount} / ${this.chapter!.acts[this.actIndex].puzzle.targets.length}`;
+    const pill = this.pillLabels.get(target.id);
+    if (pill) {
+      pill.string = `✓  ${target.name}`;
+      pill.color = GOLD;
+    }
     tween(node).to(0.18, { scale: new Vec3(1.35, 1.35, 1) }).to(0.18, { scale: new Vec3(1, 1, 1) }).start();
     node.destroy();
     if (this.foundCount >= this.chapter!.acts[this.actIndex].puzzle.targets.length) {
-      this.setAuto(() => this.showKnowledge(), 650);
+      this.setAuto(() => this.showKnowledge(), 900);
     }
   }
 
@@ -497,10 +781,18 @@ export class SpikeController extends Component {
     const target = act.puzzle.targets.find((t) => !this.foundIds.has(t.id));
     if (!target) return;
     this.hintLeft -= 1;
-    this.setHint(`提示：${target.hint}`);
-    const node = this.targetNodes.find((n) => n.name === `target-${target.id}`);
-    if (node) {
-      tween(node).to(0.12, { scale: new Vec3(1.3, 1.3, 1) }).to(0.12, { scale: new Vec3(1, 1, 1) }).start();
+    if (target.cover && !this.coversOpened.has(target.cover)) {
+      this.setHint('提示：先移开盖住它的东西。');
+      const coverNode = this.coverNodes.get(target.cover);
+      if (coverNode) {
+        tween(coverNode).to(0.12, { scale: new Vec3(1.12, 1.12, 1) }).to(0.12, { scale: new Vec3(1, 1, 1) }).start();
+      }
+    } else {
+      this.setHint(`提示：${target.hint}`);
+      const node = this.targetNodes.get(target.id);
+      if (node) {
+        tween(node).to(0.12, { scale: new Vec3(1.3, 1.3, 1) }).to(0.12, { scale: new Vec3(1, 1, 1) }).start();
+      }
     }
     if (this.hintButtonLabel) this.hintButtonLabel.string = `提示 · ${this.hintLeft}`;
   }
@@ -516,12 +808,12 @@ export class SpikeController extends Component {
     this.drawScene(this.actIndex, 'blank');
     const h = view.getVisibleSize().height;
     this.panel(0, 30, 650, Math.min(720, h - 300));
-    this.label('山 海 小 笺', 0, 260, 16, GOLD);
-    this.label(act.title, 0, 190, 34, PAPER);
-    let y = 95;
+    this.label('山 海 小 笺', 0, 280, 22, GOLD);
+    this.label(act.title, 0, 205, 42, PAPER);
+    let y = 115;
     for (const line of act.knowledge) {
-      this.label(line, 0, y, 19, PAPER, 580);
-      y -= 118;
+      this.label(line, 0, y, 24, PAPER, 580, 130);
+      y -= 150;
     }
     this.button(this.actIndex < this.chapter.acts.length - 1 ? '收下小笺 · 进入下一幕' : '收下小笺 · 查看篇末', 0, -h / 2 + 105, 580, 82, () => {
       if (this.actIndex < this.chapter!.acts.length - 1) this.showActCard(this.actIndex + 1);
@@ -536,12 +828,12 @@ export class SpikeController extends Component {
     this.drawScene(2, 'blank');
     const h = view.getVisibleSize().height;
     this.panel(0, 10, 660, Math.min(820, h - 260));
-    this.label('篇 末 · 山 海 小 笺', 0, 300, 16, GOLD);
-    this.label('精卫填海', 0, 230, 42, PAPER);
-    this.label('出自《山海经·北山经》', 0, 175, 17, GOLD);
-    this.label(this.chapter.source, 0, 60, 15, MUTED, 590);
-    this.label('精卫填海：比喻意志坚决、不畏艰难。', 0, -190, 20, PAPER, 590);
-    this.label('“精卫衔微木，将以填沧海。” —— 陶渊明', 0, -260, 17, GOLD, 590);
+    this.label('篇 末 · 山 海 小 笺', 0, 320, 22, GOLD);
+    this.label('精卫填海', 0, 245, 48, PAPER);
+    this.label('出自《山海经·北山经》', 0, 185, 20, GOLD);
+    this.label(this.chapter.source, 0, 55, 18, MUTED, 590, 230);
+    this.label('精卫填海：比喻意志坚决、不畏艰难。', 0, -200, 24, PAPER, 590);
+    this.label('“精卫衔微木，将以填沧海。” —— 陶渊明', 0, -275, 20, GOLD, 590);
     this.button('回到卷首', 0, -h / 2 + 105, 520, 82, () => {
       this.showTitle();
     });

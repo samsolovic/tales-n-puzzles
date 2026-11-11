@@ -124,7 +124,20 @@ Title
 
 Verified in the Cocos web-mobile build at 390 × 844. All three acts complete, auto cards work, the 5/5 completion timer advances, and the final knowledge card opens.
 
-Current art is deliberately placeholder: simple sea, mountains, bird, and target markers. Final Jingwei artwork is the next production step.
+Current art is deliberately placeholder: simple sea, mountains, bird, and target icons. Final Jingwei artwork is the next production step.
+
+### UI / puzzle pass
+
+- All text sizes were increased across the title, story, puzzle prompt, pills, knowledge cards and ending.
+- The `COCOS × WECHAT` banner was removed.
+- Puzzle targets no longer show text in the scene; they show only icons.
+- The target names now sit in rounded pills at the bottom. Found targets gain a `✓` prefix and gold text.
+- Two covers per act hide selected targets. Tapping a cover animates it away and reveals the icon.
+- The hint system prioritises covered targets and tells the player to move the cover first.
+- Chapter and act cards now stay for 3.0 s and 2.4 s; tapping skips.
+- The three-act prototype currently uses the same hidden-object mechanic in every act. This is a prototype choice, not a story constraint; spot-the-difference is the next puzzle-type addition.
+
+![Jingwei puzzle](jingwei-puzzle.png)
 
 ![Jingwei act 1](jingwei-act1-story.png)
 
