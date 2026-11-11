@@ -128,7 +128,9 @@ Current art is deliberately placeholder: simple sea, mountains, bird, and target
 
 ### UI / puzzle pass
 
-- All text sizes were increased across the title, story, puzzle prompt, pills, knowledge cards and ending.
+- All text sizes were increased again: story body 36, knowledge body 28, prompt 30, pills 24, secondary labels 22–24, buttons 30.
+- The title banner `COCOS × WECHAT` was removed.
+- Bottom layout now uses `safeArea.bottom` from `wx.getWindowInfo()`; story buttons, puzzle pills, hint button, knowledge button and ending button are lifted above the Android navigation bar.
 - The `COCOS × WECHAT` banner was removed.
 - Puzzle targets no longer show text in the scene; they show only icons.
 - The target names now sit in rounded pills at the bottom. Found targets gain a `✓` prefix and gold text.

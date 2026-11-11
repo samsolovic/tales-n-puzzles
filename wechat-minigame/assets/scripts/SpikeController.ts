@@ -75,6 +75,7 @@ export class SpikeController extends Component {
   private chapter: Chapter | null = null;
   private viewLayer: Node | null = null;
   private safeTop = 0;
+  private safeBottom = 0;
   private actIndex = 0;
   private pageIndex = 0;
   private foundIds = new Set<string>();
@@ -96,6 +97,7 @@ export class SpikeController extends Component {
 
   start() {
     this.safeTop = this.getSafeTop();
+    this.safeBottom = this.getSafeBottom();
     this.progressAct = this.readProgress();
     this.showLoading();
     resources.load('chapters/jingwei', JsonAsset, (error, asset) => {
@@ -144,6 +146,29 @@ export class SpikeController extends Component {
       clearTimeout(this.autoTimer);
       this.autoTimer = null;
     }
+  }
+
+  private getSafeBottom(): number {
+    const wxApi = (globalThis as any).wx;
+    if (!wxApi) return 0;
+    try {
+      const info = wxApi.getWindowInfo
+        ? wxApi.getWindowInfo()
+        : (wxApi.getSystemInfoSync ? wxApi.getSystemInfoSync() : null);
+      if (!info || !info.safeArea || !info.windowWidth) return 0;
+      const scale = view.getVisibleSize().width / info.windowWidth;
+      const inset = (info.windowHeight - info.safeArea.bottom) * scale;
+      const safeBottom = Math.max(0, inset + 36);
+      console.log('[Jingwei] safe bottom', { safeBottom, inset, safeArea: info.safeArea });
+      return safeBottom;
+    } catch (error) {
+      console.warn('[Jingwei] safe bottom failed', error);
+      return 0;
+    }
+  }
+
+  private bottomY(offset: number): number {
+    return -view.getVisibleSize().height / 2 + this.safeBottom + offset;
   }
 
   private readProgress(): number {
@@ -229,7 +254,7 @@ export class SpikeController extends Component {
     g.strokeColor = primary ? new Color(255, 229, 166, 180) : new Color(213, 168, 90, 120);
     g.roundRect(-w / 2, -h / 2, w, h, 8);
     g.stroke();
-    const l = this.label(text, 0, 0, 28, primary ? INK : PAPER, w - 30);
+    const l = this.label(text, 0, 0, 30, primary ? INK : PAPER, w - 30);
     l.node.removeFromParent();
     n.addChild(l.node);
     l.node.setPosition(0, 0);
@@ -267,10 +292,10 @@ export class SpikeController extends Component {
 
     // Sky glow / moon
     g.fillColor = storm ? new Color(115, 135, 140, 24) : new Color(226, 202, 145, 32);
-    g.circle(205, h / 2 - 300, 190);
+    g.circle(240, h / 2 - 300, 190);
     g.fill();
     g.fillColor = storm ? new Color(170, 180, 178, 210) : new Color(244, 224, 171, 230);
-    g.circle(205, h / 2 - 300, 52);
+    g.circle(240, h / 2 - 300, 48);
     g.fill();
 
     // Distant mountains
@@ -343,8 +368,8 @@ export class SpikeController extends Component {
   private header(kicker: string, title: string) {
     const top = view.getVisibleSize().height / 2;
     const y = top - this.safeTop;
-    this.label(kicker, 0, y - 44, 19, GOLD, 680);
-    this.label(title, 0, y - 110, 36, PAPER, 680);
+    this.label(kicker, 0, y - 44, 22, GOLD, 680);
+    this.label(title, 0, y - 112, 40, PAPER, 680);
   }
 
   private showLoading() {
@@ -366,12 +391,12 @@ export class SpikeController extends Component {
     this.drawScene(0, 'title');
     const top = view.getVisibleSize().height / 2;
     const shift = this.safeTop;
-    this.label('解谜涨知识', 0, top - shift - 170, 72, PAPER);
-    this.label('之 · 山海经', 0, top - shift - 250, 34, GOLD);
-    this.label('读故事 · 寻线索 · 收小笺', 0, top - shift - 315, 24, MUTED);
+    this.label('解谜涨知识', 0, top - shift - 170, 76, PAPER);
+    this.label('之 · 山海经', 0, top - shift - 252, 38, GOLD);
+    this.label('读故事 · 寻线索 · 收小笺', 0, top - shift - 320, 27, MUTED);
 
     const label = this.progressAct >= 3 ? '再读一遍 · 精卫填海' : (this.progressAct > 0 ? '继续 · 精卫填海' : '开始 · 精卫填海');
-    this.button(label, 0, -view.getVisibleSize().height / 2 + 155, 560, 86, () => {
+    this.button(label, 0, this.bottomY(110), 560, 90, () => {
       if (this.progressAct > 0 && this.progressAct < 3) {
         this.showActCard(this.progressAct);
       } else {
@@ -379,19 +404,19 @@ export class SpikeController extends Component {
       }
     }, true);
 
-    this.label('每章三幕 · 一幕一谜 · 篇末一张山海小笺', 0, -view.getVisibleSize().height / 2 + 70, 17, MUTED);
+    this.label('每章三幕 · 一幕一谜 · 篇末一张山海小笺', 0, this.bottomY(24), 20, MUTED);
   }
 
   private showChapterCard() {
     this.clearView();
     this.drawScene(0, 'blank');
-    const h = view.getVisibleSize().height;
-    this.label('第 一 篇', 0, 220, 20, GOLD);
-    this.label('精卫填海', 0, 80, 60, PAPER);
-    this.label('炎帝之少女，溺而不返，化为精卫。', 0, -20, 24, MUTED, 620);
-    this.label('三幕 · 三个谜 · 一张山海小笺', 0, -85, 18, GOLD);
-    this.label('点击继续', 0, -h / 2 + 90, 18, MUTED);
+    this.label('第 一 篇', 0, 220, 24, GOLD);
+    this.label('精卫填海', 0, 80, 64, PAPER);
+    this.label('炎帝之少女，溺而不返，化为精卫。', 0, -20, 28, MUTED, 620);
+    this.label('三幕 · 三个谜 · 一张山海小笺', 0, -90, 22, GOLD);
+    this.label('点击继续', 0, this.bottomY(24), 22, MUTED);
 
+    const h = view.getVisibleSize().height;
     const skip = this.uiNode('Skip', 750, h);
     skip.on(Node.EventType.TOUCH_END, () => {
       this.clearAuto();
@@ -411,9 +436,9 @@ export class SpikeController extends Component {
     this.clearView();
     this.drawScene(index, 'blank');
     const act = this.chapter.acts[index];
-    this.label(act.kicker, 0, 190, 20, GOLD);
-    this.label(act.title, 0, 80, 48, PAPER, 680);
-    this.label('点击继续', 0, -view.getVisibleSize().height / 2 + 90, 18, MUTED);
+    this.label(act.kicker, 0, 190, 24, GOLD);
+    this.label(act.title, 0, 80, 52, PAPER, 680);
+    this.label('点击继续', 0, this.bottomY(24), 22, MUTED);
 
     const skip = this.uiNode('Skip', 750, view.getVisibleSize().height);
     skip.on(Node.EventType.TOUCH_END, () => {
@@ -437,11 +462,11 @@ export class SpikeController extends Component {
     this.header(act.kicker, act.title);
 
     const h = view.getVisibleSize().height;
-    const panelY = -h / 2 + 330;
-    this.panel(0, panelY, 660, 440);
-    this.label(act.pages[pageIndex], 0, panelY + 35, 32, PAPER, 590, 250);
-    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, panelY - 155, 20, MUTED);
-    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, -h / 2 + 105, 540, 82, () => {
+    const panelY = this.bottomY(360);
+    this.panel(0, panelY, 660, 430);
+    this.label(act.pages[pageIndex], 0, panelY + 35, 36, PAPER, 590, 260);
+    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, panelY - 155, 24, MUTED);
+    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, this.bottomY(75), 540, 86, () => {
       this.showStory(actIndex, pageIndex + 1);
     });
   }
@@ -463,9 +488,9 @@ export class SpikeController extends Component {
     const areaBottom = bottom + 355;
     const areaTop = top - this.safeTop - 190;
 
-    this.label(act.puzzle.prompt, 0, top - this.safeTop - 170, 26, PAPER, 650);
+    this.label(act.puzzle.prompt, 0, top - this.safeTop - 170, 30, PAPER, 650);
     this.progressLabel = null;
-    this.hintText = this.label('', 0, bottom + 300, 21, GOLD, 690);
+    this.hintText = this.label('', 0, this.bottomY(300), 24, GOLD, 690);
 
     for (const target of act.puzzle.targets) {
       const px = -330 + target.x * 660;
@@ -493,8 +518,9 @@ export class SpikeController extends Component {
 
     const pillW = 202;
     const pillH = 58;
-    const row1Y = bottom + 235;
-    const row2Y = bottom + 165;
+    const listLift = this.safeBottom;
+    const row1Y = bottom + 235 + listLift;
+    const row2Y = bottom + 165 + listLift;
     act.puzzle.targets.forEach((target, index) => {
       let x = 0;
       let y = row1Y;
@@ -507,9 +533,9 @@ export class SpikeController extends Component {
       this.makePill(target, x, y, pillW, pillH);
     });
 
-    const hintButton = this.button('提示 · 3', -175, bottom + 72, 250, 64, () => this.useHint(), false);
+    const hintButton = this.button('提示 · 3', -175, this.bottomY(55), 250, 70, () => this.useHint(), false);
     this.hintButtonLabel = hintButton.getComponentInChildren(Label);
-    this.label('找到所有物品即可继续', 175, bottom + 72, 17, MUTED, 330);
+    this.label('找到所有物品即可继续', 175, this.bottomY(55), 20, MUTED, 330);
   }
 
   private makePill(target: PuzzleTarget, x: number, y: number, w: number, h: number) {
@@ -523,7 +549,7 @@ export class SpikeController extends Component {
     g.strokeColor = new Color(213, 168, 90, 80);
     g.roundRect(-w / 2, -h / 2, w, h, 12);
     g.stroke();
-    const l = this.label(target.name, 0, 0, 22, PAPER, w - 20);
+    const l = this.label(target.name, 0, 0, 24, PAPER, w - 20);
     l.node.removeFromParent();
     n.addChild(l.node);
     l.node.setPosition(0, 0);
@@ -807,15 +833,15 @@ export class SpikeController extends Component {
     this.clearView();
     this.drawScene(this.actIndex, 'blank');
     const h = view.getVisibleSize().height;
-    this.panel(0, 30, 650, Math.min(720, h - 300));
-    this.label('山 海 小 笺', 0, 280, 22, GOLD);
-    this.label(act.title, 0, 205, 42, PAPER);
-    let y = 115;
+    this.panel(0, 30, 650, Math.min(840, h - 280));
+    this.label('山 海 小 笺', 0, 290, 26, GOLD);
+    this.label(act.title, 0, 210, 44, PAPER);
+    let y = 120;
     for (const line of act.knowledge) {
-      this.label(line, 0, y, 24, PAPER, 580, 130);
-      y -= 150;
+      this.label(line, 0, y, 28, PAPER, 580, 150);
+      y -= 160;
     }
-    this.button(this.actIndex < this.chapter.acts.length - 1 ? '收下小笺 · 进入下一幕' : '收下小笺 · 查看篇末', 0, -h / 2 + 105, 580, 82, () => {
+    this.button(this.actIndex < this.chapter.acts.length - 1 ? '收下小笺 · 进入下一幕' : '收下小笺 · 查看篇末', 0, this.bottomY(75), 580, 86, () => {
       if (this.actIndex < this.chapter!.acts.length - 1) this.showActCard(this.actIndex + 1);
       else this.showEnding();
     });
@@ -827,14 +853,14 @@ export class SpikeController extends Component {
     this.clearView();
     this.drawScene(2, 'blank');
     const h = view.getVisibleSize().height;
-    this.panel(0, 10, 660, Math.min(820, h - 260));
-    this.label('篇 末 · 山 海 小 笺', 0, 320, 22, GOLD);
-    this.label('精卫填海', 0, 245, 48, PAPER);
-    this.label('出自《山海经·北山经》', 0, 185, 20, GOLD);
-    this.label(this.chapter.source, 0, 55, 18, MUTED, 590, 230);
-    this.label('精卫填海：比喻意志坚决、不畏艰难。', 0, -200, 24, PAPER, 590);
-    this.label('“精卫衔微木，将以填沧海。” —— 陶渊明', 0, -275, 20, GOLD, 590);
-    this.button('回到卷首', 0, -h / 2 + 105, 520, 82, () => {
+    this.panel(0, 10, 660, Math.min(850, h - 240));
+    this.label('篇 末 · 山 海 小 笺', 0, 330, 26, GOLD);
+    this.label('精卫填海', 0, 250, 50, PAPER);
+    this.label('出自《山海经·北山经》', 0, 185, 23, GOLD);
+    this.label(this.chapter.source, 0, 45, 20, MUTED, 590, 240);
+    this.label('精卫填海：比喻意志坚决、不畏艰难。', 0, -210, 28, PAPER, 590);
+    this.label('“精卫衔微木，将以填沧海。” —— 陶渊明', 0, -285, 22, GOLD, 590);
+    this.button('回到卷首', 0, this.bottomY(75), 520, 86, () => {
       this.showTitle();
     });
   }
