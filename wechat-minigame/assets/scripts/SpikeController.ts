@@ -94,18 +94,18 @@ export class SpikeController extends Component {
     const titleNode = this.makeNode('Title', 700, 110);
     titleNode.setPosition(0, top - 130);
     const title = titleNode.addComponent(Label);
-    title.string = '故事有谜';
-    title.fontSize = 76;
-    title.lineHeight = 86;
+    title.string = '解谜涨知识';
+    title.fontSize = 68;
+    title.lineHeight = 80;
     title.color = PAPER;
     title.horizontalAlign = Label.HorizontalAlign.CENTER;
 
     const subNode = this.makeNode('Subtitle', 700, 50);
     subNode.setPosition(0, top - 210);
     const sub = subNode.addComponent(Label);
-    sub.string = '山海拾遗 · 最小验证';
-    sub.fontSize = 28;
-    sub.lineHeight = 36;
+    sub.string = '之 · 山海经';
+    sub.fontSize = 32;
+    sub.lineHeight = 40;
     sub.color = GOLD;
     sub.horizontalAlign = Label.HorizontalAlign.CENTER;
 

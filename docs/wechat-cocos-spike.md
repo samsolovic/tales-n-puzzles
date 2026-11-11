@@ -1,7 +1,7 @@
 # WeChat Mini Game — Cocos Validation Spike
 
-Project name: **故事有谜**  
-First release: **故事有谜·山海拾遗**
+Project name: **解谜涨知识**  
+First release: **解谜涨知识之山海经**
 
 ![Cocos WeChat validation spike](wechat-cocos-spike.png)
 
@@ -72,7 +72,7 @@ Validation scene:
 - One tappable difference / hidden object
 - Correct tap: toast + counter
 - Wrong tap: small shake / toast
-- Chinese heading: `故事有谜` / `山海拾遗`
+- Chinese heading: `解谜涨知识` / `之 · 山海经`
 - Save a flag with `wx.setStorageSync` and read it back
 - One simple sound effect, optional
 - Build target: WeChat Mini Game

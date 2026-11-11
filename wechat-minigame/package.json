@@ -1,8 +1,8 @@
 {
-  "name": "gushi-youmi-wechat",
+  "name": "jiemi-zhangzhishi-wechat",
   "version": "0.0.1",
   "private": true,
-  "description": "故事有谜 - WeChat Mini Game Cocos validation spike",
+  "description": "解谜涨知识 - WeChat Mini Game Cocos validation spike",
   "creator": {
     "version": "3.8.8"
   },
