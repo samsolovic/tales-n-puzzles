@@ -3,6 +3,8 @@
 Project name: **故事有谜**  
 First release: **故事有谜·山海拾遗**
 
+![Cocos WeChat validation spike](wechat-cocos-spike.png)
+
 ## Short answer
 
 You do **not** need a registered Mini Game AppID or a completed filing to start the Cocos validation spike.
