@@ -1,0 +1,7 @@
+{
+  "prompt": "Use the provided bird image as the exact character and style reference. Vertical 9:16 Chinese mythological storybook illustration. Pale gold dawn between Mount Fajiu and the East Sea. The same black crow-like mythical bird flies at center, patterned crown in pale gold and stone blue, bright white beak, vivid cinnabar red feet, carrying a small zebrawood branch in its beak. Left side: dark mountain slopes with zebrawood and pine. Right side: vast calm sea. Five findable objects between 42% and 70% of the image height: the zebrawood branch in the bird's beak, a pine branch on a rock, a white stone, a green stone, and a bent reed at the water's edge. A piece of cloth and a rock can serve as covers. The bottom 25% must be only sand, shallow water and plain rocks, with no critical objects. The top 15% is dawn sky for UI. Mineral pigment on silk, fine ink linework, muted malachite, stone blue and pale gold, quiet determined mood. No text, no watermark, no logo, no modern objects, no anime, no 3D render.",
+  "reference": "/tmp/jingwei-v2-ref.jpg",
+  "size": "1440x2560",
+  "outDir": "docs/art/scenes",
+  "prefix": "act3-puzzle-plate"
+}

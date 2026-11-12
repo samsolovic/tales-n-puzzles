@@ -1,0 +1,30 @@
+{
+  "run": "act2-puzzle-plate-20261112-101432",
+  "prompt": "Use the provided bird image as the exact character and style reference. Vertical 9:16 Chinese mythological storybook illustration. A violent storm over the East Sea. The black crow-like mythical bird bursts up from the waves at the center, wings spread wide, patterned crown in pale gold and stone blue, bright white beak, vivid cinnabar red feet, holding a grey stone in its beak. The bird is the focal point but not too large. Five findable details are placed between 42% and 70% of the image height: a loose black feather caught on driftwood at lower left, the patterned crown, the white beak, one red foot on a rock, and a grey stone near the bird. Seaweed and broken driftwood in the foreground. The bottom 25% must be only dark waves and sea foam, with no objects. The top 15% is storm sky for UI. Cold ink-black, deep teal, white and cinnabar accents, mineral pigment on silk, fine ink linework, subtle paper grain. No text, no watermark, no logo, no modern objects, no anime, no 3D render.",
+  "reference": "docs/art/characters/jingwei-character-v2.jpg",
+  "requestedModel": "doubao-seedream-5-0-pro-260628",
+  "requestedSize": "1440x2560",
+  "layerDecomposition": false,
+  "responseModel": "doubao-seedream-5-0-pro-260628",
+  "responseCreated": 1794449672,
+  "images": [
+    "/Users/sam/AgentSharedProjects/tales-n-puzzles/docs/art/scenes/act2-puzzle-plate-20261112-101432-1.jpg"
+  ],
+  "layers": [
+    {
+      "file": "/Users/sam/AgentSharedProjects/tales-n-puzzles/docs/art/scenes/act2-puzzle-plate-20261112-101432-1.jpg",
+      "zIndex": null,
+      "name": null,
+      "description": null,
+      "boundingBox": null,
+      "size": "1440x2560",
+      "outputFormat": "jpeg"
+    }
+  ],
+  "rawUsage": {
+    "input_images": 1,
+    "generated_images": 1,
+    "output_tokens": 14400,
+    "total_tokens": 14400
+  }
+}

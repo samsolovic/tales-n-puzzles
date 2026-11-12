@@ -124,7 +124,14 @@ Title
 
 Verified in the Cocos web-mobile build at 390 × 844. All three acts complete, auto cards work, the 5/5 completion timer advances, and the final knowledge card opens.
 
-Current art is deliberately placeholder: simple sea, mountains, bird, and target icons. Final Jingwei artwork is the next production step.
+The chapter now uses final-direction AI artwork for all three acts:
+
+- Act 1 story: `act1-story.jpg`
+- Act 1 puzzle: `act1-puzzle.jpg`
+- Act 2: `act2.jpg`
+- Act 3: `act3.jpg`
+
+The first-act target icons were cut from Seedream 5.0 Pro `layer_decomposition`; the remaining acts use the existing vector fallback icons. The target hit zones are now mapped to full-screen art coordinates rather than the old programmatic scene area.
 
 ### UI / puzzle pass
 
@@ -139,11 +146,47 @@ Current art is deliberately placeholder: simple sea, mountains, bird, and target
 - Chapter and act cards now stay for 3.0 s and 2.4 s; tapping skips.
 - The three-act prototype currently uses the same hidden-object mechanic in every act. This is a prototype choice, not a story constraint; spot-the-difference is the next puzzle-type addition.
 
+![Jingwei title](jingwei-title.png)
+
 ![Jingwei puzzle](jingwei-puzzle.png)
 
 ![Jingwei act 1](jingwei-act1-story.png)
 
+![Jingwei act 2](jingwei-act2.png)
+
+![Jingwei act 3](jingwei-act3.png)
+
 ![Jingwei ending](jingwei-ending.png)
+
+### Chapter asset bundle / WeChat subpackage
+
+The chapter art is in a separate Cocos Asset Bundle:
+
+```text
+assets/bundles/chapter-jingwei/
+  act1-story.jpg
+  act1-puzzle.jpg
+  act2.jpg
+  act3.jpg
+  items/*.png
+```
+
+Build result:
+
+- Main package: **3.51 MB**
+- Chapter subpackage: **2.34 MB**
+- Total: **5.85 MB**
+
+`tools/art/patch-wechat-build.mjs` adds the WeChat subpackage entry to the built `game.json` and patches AppID/project name. Run it after every WeChat build.
+
+The runtime calls `wx.loadSubpackage({ name: 'chapter-jingwei' })` before `assetManager.loadBundle`, so the first entry shows the "正在展开山海卷……" progress screen.
+
+### Known limitations in this pass
+
+- Act 2 and Act 3 target hit zones are tight and some objects sit close to the bottom pill bar.
+- Act 2/3 pill icons are vector fallbacks, not AI cutouts.
+- Covers are still Cocos-drawn cloth/rock shapes rather than painted cover art.
+- Real-device validation is still required for the subpackage download and the Android safe area.
 
 ## Current machine status
 

@@ -1,0 +1,7 @@
+{
+  "prompt": "Edit this storm scene while preserving the bird, lightning, waves, painting style and palette. Move the loose black feather from the bottom driftwood up to the middle-left rocks, between 48% and 62% of the image height. Move the foreground seaweed and driftwood out of the bottom quarter, or remove them. Keep the patterned crown, white beak, red foot and grey stone near the bird in the central band. The bottom 25% of the image must contain only dark storm waves and sea foam, with no feather, no seaweed, no driftwood, no stones. Keep the bird large and dramatic but make all five findable details visible above 72% of the image height: loose feather, patterned crown, white beak, red foot, grey stone. No text, no watermark, no logo, no new birds, no modern objects, no anime, no 3D render. Vertical 9:16, mineral pigment on silk, cold ink-black and deep teal.",
+  "reference": "/tmp/act2-ref.jpg",
+  "size": "1440x2560",
+  "outDir": "docs/art/scenes",
+  "prefix": "act2-puzzle-plate-v2"
+}

@@ -14,6 +14,10 @@ import {
   Vec3,
   resources,
   JsonAsset,
+  assetManager,
+  Sprite,
+  SpriteFrame,
+  Texture2D,
 } from 'cc';
 
 const { ccclass } = _decorator;
@@ -90,6 +94,10 @@ export class SpikeController extends Component {
   private hintButtonLabel: Label | null = null;
   private progressLabel: Label | null = null;
   private autoTimer: any = null;
+  private artBundle: any = null;
+  private artFrames = new Map<string, SpriteFrame>();
+  private iconFrames = new Map<string, SpriteFrame>();
+  private loadingLabel: Label | null = null;
 
   onLoad() {
     view.setDesignResolutionSize(750, 1334, ResolutionPolicy.FIXED_WIDTH);
@@ -100,6 +108,13 @@ export class SpikeController extends Component {
     this.safeBottom = this.getSafeBottom();
     this.progressAct = this.readProgress();
     this.showLoading();
+
+    let pending = 2;
+    const done = () => {
+      pending -= 1;
+      if (pending <= 0) this.showTitle();
+    };
+
     resources.load('chapters/jingwei', JsonAsset, (error, asset) => {
       if (error) {
         console.error('[Jingwei] chapter load failed', error);
@@ -108,8 +123,103 @@ export class SpikeController extends Component {
       }
       this.chapter = asset.json as unknown as Chapter;
       console.log('[Jingwei] chapter loaded', this.chapter?.title, 'progress', this.progressAct);
-      this.showTitle();
+      done();
     });
+
+    this.loadArtBundle(done);
+  }
+
+  private loadArtBundle(done: () => void) {
+    const loadBundle = () => {
+      assetManager.loadBundle('chapter-jingwei', (error: Error | null, bundle: any) => {
+        if (error) {
+          console.warn('[Jingwei] art bundle failed', error);
+          done();
+          return;
+        }
+        this.artBundle = bundle;
+        this.preloadArt(done);
+      });
+    };
+
+    const wxApi = (globalThis as any).wx;
+    if (wxApi && typeof wxApi.loadSubpackage === 'function') {
+      wxApi.loadSubpackage({
+        name: 'chapter-jingwei',
+        success: () => loadBundle(),
+        fail: (error: any) => {
+          console.warn('[Jingwei] subpackage download failed', error);
+          loadBundle();
+        },
+        onProgressUpdate: (res: any) => {
+          if (this.loadingLabel && res && typeof res.progress === 'number') {
+            this.loadingLabel.string = `正在展开山海卷…… ${Math.round(res.progress * 100)}%`;
+          }
+        },
+      });
+      return;
+    }
+    loadBundle();
+  }
+
+  private preloadArt(done: () => void) {
+    if (!this.artBundle) {
+      done();
+      return;
+    }
+    const images = ['act1-story', 'act1-puzzle', 'act2', 'act3'];
+    const icons = ['leaf', 'shell', 'boat', 'jade', 'bird'];
+    let pending = images.length + icons.length;
+    const finish = () => {
+      pending -= 1;
+      if (pending <= 0) {
+        console.log('[Jingwei] art preload complete', this.artFrames.size, this.iconFrames.size);
+        done();
+      }
+    };
+    for (const name of images) {
+      this.loadTextureFrame(name, (frame) => {
+        if (frame) this.artFrames.set(name, frame);
+        finish();
+      });
+    }
+    for (const name of icons) {
+      this.loadTextureFrame(`items/${name}`, (frame) => {
+        if (frame) this.iconFrames.set(name, frame);
+        finish();
+      });
+    }
+  }
+
+  private loadTextureFrame(name: string, onDone: (frame: SpriteFrame | null) => void) {
+    if (!this.artBundle) {
+      onDone(null);
+      return;
+    }
+    this.artBundle.load(`${name}/texture`, Texture2D, (error: Error | null, texture: Texture2D) => {
+      if (error || !texture) {
+        console.warn('[Jingwei] texture load failed', name, error);
+        onDone(null);
+        return;
+      }
+      const frame = new SpriteFrame();
+      frame.texture = texture;
+      onDone(frame);
+    });
+  }
+
+  private artName(actIndex: number, mode: string): string {
+    if (actIndex === 0) return mode === 'puzzle' ? 'act1-puzzle' : 'act1-story';
+    return actIndex === 1 ? 'act2' : 'act3';
+  }
+
+  private artShade(y: number, height: number, alpha: number) {
+    const n = this.uiNode('ArtShade', 750, height);
+    n.setPosition(0, y);
+    const g = n.addComponent(Graphics);
+    g.fillColor = new Color(7, 15, 20, alpha);
+    g.rect(-375, -height / 2, 750, height);
+    g.fill();
   }
 
   private getSafeTop(): number {
@@ -279,6 +389,22 @@ export class SpikeController extends Component {
   private drawScene(actIndex: number, mode = 'story') {
     const w = 750;
     const h = view.getVisibleSize().height;
+    const frame = this.artFrames.get(this.artName(actIndex, mode));
+    if (frame) {
+      const n = this.uiNode('SceneArt', w, h);
+      const sp = n.addComponent(Sprite);
+      sp.spriteFrame = frame;
+      sp.sizeMode = Sprite.SizeMode.CUSTOM;
+      n.getComponent(UITransform)!.setContentSize(w, h);
+      if (mode === 'story') {
+        this.artShade(-h / 2 + h * 0.22, h * 0.44, 190);
+      } else if (mode === 'title' || mode === 'blank') {
+        this.artShade(0, h, 118);
+      } else if (mode === 'puzzle') {
+        this.artShade(h / 2 - 110, 220, 55);
+      }
+      return;
+    }
     const n = this.uiNode('Scene', w, h);
     const g = n.addComponent(Graphics);
 
@@ -376,7 +502,7 @@ export class SpikeController extends Component {
     this.clearView();
     this.drawScene(0, 'blank');
     this.label('解谜涨知识', 0, 40, 34, PAPER);
-    this.label('正在展开山海卷……', 0, -20, 18, MUTED);
+    this.loadingLabel = this.label('正在展开山海卷……', 0, -20, 24, MUTED);
   }
 
   private showError() {
@@ -492,22 +618,26 @@ export class SpikeController extends Component {
     this.progressLabel = null;
     this.hintText = this.label('', 0, this.bottomY(300), 26, GOLD, 690);
 
+    const artMode = this.artFrames.size > 0;
     for (const target of act.puzzle.targets) {
-      const px = -330 + target.x * 660;
-      const py = areaBottom + target.y * (areaTop - areaBottom);
-      const n = this.uiNode(`target-${target.id}`, 110, 110);
+      const px = artMode ? -375 + target.x * 750 : -330 + target.x * 660;
+      const py = artMode ? -h / 2 + target.y * h : areaBottom + target.y * (areaTop - areaBottom);
+      const hitSize = artMode ? (['head', 'beak', 'stone'].includes(target.id) ? 86 : 112) : 130;
+      const n = this.uiNode(`target-${target.id}`, hitSize, hitSize);
       n.setPosition(px, py);
-      n.setScale(1.12, 1.12, 1);
-      const g = n.addComponent(Graphics);
-      this.drawIcon(g, target.icon);
+      n.setScale(1.08, 1.08, 1);
+      if (this.artFrames.size === 0) {
+        const g = n.addComponent(Graphics);
+        this.drawIcon(g, target.icon);
+      }
       n.active = !target.cover;
       n.on(Node.EventType.TOUCH_END, () => this.findTarget(target, n), this);
       this.targetNodes.set(target.id, n);
     }
 
     for (const cover of act.puzzle.covers || []) {
-      const px = -330 + cover.x * 660;
-      const py = areaBottom + cover.y * (areaTop - areaBottom);
+      const px = artMode ? -375 + cover.x * 750 : -330 + cover.x * 660;
+      const py = artMode ? -h / 2 + cover.y * h : areaBottom + cover.y * (areaTop - areaBottom);
       const n = this.uiNode(`cover-${cover.id}`, cover.w, cover.h);
       n.setPosition(px, py);
       const g = n.addComponent(Graphics);
@@ -549,11 +679,31 @@ export class SpikeController extends Component {
     g.strokeColor = new Color(213, 168, 90, 80);
     g.roundRect(-w / 2, -h / 2, w, h, 12);
     g.stroke();
-    const l = this.label(target.name, 0, 0, 26, PAPER, w - 20);
+    const icon = this.iconFrames.get(target.icon);
+    const hasIcon = Boolean(icon) || this.artFrames.size > 0;
+    const labelWidth = hasIcon ? w - 58 : w - 20;
+    const l = this.label(target.name, hasIcon ? 18 : 0, 0, 26, PAPER, labelWidth);
     l.node.removeFromParent();
     n.addChild(l.node);
-    l.node.setPosition(0, 0);
+    l.node.setPosition(hasIcon ? 18 : 0, 0);
     this.pillLabels.set(target.id, l);
+    if (hasIcon) {
+      const iconNode = new Node('PillIcon');
+      iconNode.layer = Layers.Enum.UI_2D;
+      iconNode.addComponent(UITransform).setContentSize(38, 38);
+      if (icon) {
+        const sp = iconNode.addComponent(Sprite);
+        sp.spriteFrame = icon;
+        sp.sizeMode = Sprite.SizeMode.CUSTOM;
+      } else {
+        const g = iconNode.addComponent(Graphics);
+        iconNode.setScale(0.55, 0.55, 1);
+        this.drawIcon(g, target.icon);
+      }
+      iconNode.getComponent(UITransform)!.setContentSize(38, 38);
+      n.addChild(iconNode);
+      iconNode.setPosition(-w / 2 + 28, 0);
+    }
   }
 
   private drawIcon(g: Graphics, icon: string) {
@@ -714,7 +864,7 @@ export class SpikeController extends Component {
     const h = cover.h;
     g.lineWidth = 2;
     g.strokeColor = new Color(213, 168, 90, 150);
-    g.fillColor = new Color(22, 42, 49, 255);
+    g.fillColor = new Color(24, 44, 52, 195);
     if (cover.kind === 'rock') {
       g.moveTo(-w / 2, h / 2);
       g.lineTo(-w * 0.32, -h / 2);
@@ -725,12 +875,18 @@ export class SpikeController extends Component {
       g.fill();
       g.stroke();
     } else if (cover.kind === 'seaweed') {
+      g.fillColor = new Color(18, 52, 47, 150);
+      g.roundRect(-w / 2, -h / 2, w, h, 10);
+      g.fill();
       for (let i = -2; i <= 2; i++) {
         g.moveTo(i * 12, h / 2);
         g.lineTo(i * 18, -h / 2);
       }
       g.stroke();
     } else if (cover.kind === 'driftwood') {
+      g.fillColor = new Color(50, 38, 28, 165);
+      g.roundRect(-w / 2, -h / 2, w, h, 10);
+      g.fill();
       g.moveTo(-w / 2, h / 3);
       g.lineTo(w / 2, -h / 3);
       g.moveTo(-w / 4, -h / 6);
@@ -745,8 +901,11 @@ export class SpikeController extends Component {
       g.lineTo(w / 2 - 16, -h / 4);
       g.stroke();
     }
-    // A small non-text sparkle marks the cover as movable.
     g.lineWidth = 2;
+    g.strokeColor = new Color(213, 168, 90, 200);
+    g.roundRect(-w / 2, -h / 2, w, h, 10);
+    g.stroke();
+    // A small non-text sparkle marks the cover as movable.
     g.strokeColor = new Color(243, 230, 201, 200);
     const sx = w / 2 - 14;
     const sy = -h / 2 + 12;

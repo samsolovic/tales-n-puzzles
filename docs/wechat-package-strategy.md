@@ -113,9 +113,18 @@ assetManager.loadBundle('chapter-jingwei', (err, bundle) => {
 
 当前状态：
 
-- 主包：3.6MB
-- 第一篇预计：2–4MB
-- 总包：仍远低于 30MB
+- 主包：**3.51MB**
+- 精卫篇分包：**2.34MB**
+- 总包：**5.85MB**
+- 仍远低于 30MB
+
+构建后需要运行：
+
+```bash
+node tools/art/patch-wechat-build.mjs
+```
+
+它会把 `assets/chapter-jingwei/` 写进微信 `game.json` 的 `subpackages`，并修正 AppID。
 
 ## 单机还是联网
 
