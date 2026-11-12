@@ -31,6 +31,18 @@ const TEAL = new Color(46, 105, 112, 255);
 const STORM = new Color(8, 18, 26, 255);
 const PROGRESS_KEY = 'jiemi-jingwei-progress-v1';
 
+// Layout knobs. All values are in the 750-wide design space.
+const LAYOUT = {
+  headerHeight: 250,
+  puzzleBarHeight: 300,
+  storyPanelWidth: 660,
+  storyPanelHeight: 300,
+  storyButtonWidth: 540,
+  storyButtonHeight: 86,
+  pillWidth: 202,
+  pillHeight: 58,
+};
+
 interface PuzzleTarget {
   id: string;
   name: string;
@@ -414,22 +426,22 @@ export class SpikeController extends Component {
     const top = h / 2;
     const bottom = -h / 2;
     if (mode === 'puzzle') {
-      const barHeight = 300;
-      const imageTop = top - this.safeTop - 250;
+      const barHeight = LAYOUT.puzzleBarHeight;
+      const imageTop = top - this.safeTop - LAYOUT.headerHeight;
       const imageBottom = bottom + this.safeBottom + barHeight + 14;
       return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
     }
     const buttonY = this.bottomY(75);
-    const panelHeight = 300;
+    const panelHeight = LAYOUT.storyPanelHeight;
     const panelBottom = buttonY + 43 + 18;
-    const imageTop = top - this.safeTop - 250;
+    const imageTop = top - this.safeTop - LAYOUT.headerHeight;
     const imageBottom = panelBottom + panelHeight + 14;
     return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
   }
 
   private storyLayout(): { panelY: number; buttonY: number } {
     const buttonY = this.bottomY(75);
-    const panelHeight = 300;
+    const panelHeight = LAYOUT.storyPanelHeight;
     const panelBottom = buttonY + 43 + 18;
     return { panelY: panelBottom + panelHeight / 2, buttonY };
   }
@@ -490,7 +502,7 @@ export class SpikeController extends Component {
     }
 
     if (mode === 'puzzle') {
-      const barHeight = this.safeBottom + 300;
+      const barHeight = this.safeBottom + LAYOUT.puzzleBarHeight;
       const bar = this.uiNode('PuzzleBar', w, barHeight);
       bar.setPosition(0, -h / 2 + barHeight / 2);
       const g = bar.addComponent(Graphics);
@@ -712,10 +724,10 @@ export class SpikeController extends Component {
     this.header(act.kicker, act.title);
 
     const layout = this.storyLayout();
-    this.panel(0, layout.panelY, 660, 300);
+    this.panel(0, layout.panelY, LAYOUT.storyPanelWidth, LAYOUT.storyPanelHeight);
     this.label(act.pages[pageIndex], 0, layout.panelY + 8, 38, PAPER, 590, 190);
     this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, layout.panelY - 112, 26, MUTED);
-    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, layout.buttonY, 540, 86, () => {
+    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, layout.buttonY, LAYOUT.storyButtonWidth, LAYOUT.storyButtonHeight, () => {
       this.showStory(actIndex, pageIndex + 1);
     });
   }
@@ -771,8 +783,8 @@ export class SpikeController extends Component {
       this.coverNodes.set(cover.id, n);
     }
 
-    const pillW = 202;
-    const pillH = 58;
+    const pillW = LAYOUT.pillWidth;
+    const pillH = LAYOUT.pillHeight;
     const listLift = this.safeBottom;
     const row1Y = bottom + 235 + listLift;
     const row2Y = bottom + 165 + listLift;
