@@ -98,6 +98,9 @@ export class SpikeController extends Component {
   private artFrames = new Map<string, SpriteFrame>();
   private iconFrames = new Map<string, SpriteFrame>();
   private loadingLabel: Label | null = null;
+  private artViewportNode: Node | null = null;
+  private artViewport = { y: 0, height: 0 };
+  private artDisplay = { width: 0, height: 0 };
 
   onLoad() {
     view.setDesignResolutionSize(750, 1334, ResolutionPolicy.FIXED_WIDTH);
@@ -208,10 +211,12 @@ export class SpikeController extends Component {
     });
   }
 
-  private artDisplaySize(frame: SpriteFrame, width: number, height: number): { width: number; height: number } {
+  private artDisplaySize(frame: SpriteFrame, width: number, height: number, fit: 'cover' | 'contain' = 'cover'): { width: number; height: number } {
     const imageWidth = frame.originalSize?.width || frame.rect?.width || width;
     const imageHeight = frame.originalSize?.height || frame.rect?.height || height;
-    const scale = Math.max(width / imageWidth, height / imageHeight);
+    const scale = fit === 'contain'
+      ? Math.min(width / imageWidth, height / imageHeight)
+      : Math.max(width / imageWidth, height / imageHeight);
     return { width: imageWidth * scale, height: imageHeight * scale };
   }
 
@@ -330,6 +335,9 @@ export class SpikeController extends Component {
     this.pillLabels.clear();
     this.coverNodes.clear();
     this.coversOpened.clear();
+    this.artViewportNode = null;
+    this.artViewport = { y: 0, height: 0 };
+    this.artDisplay = { width: 0, height: 0 };
     this.foundIds.clear();
     this.foundCount = 0;
     this.hintLeft = 3;
@@ -340,6 +348,14 @@ export class SpikeController extends Component {
     n.layer = Layers.Enum.UI_2D;
     n.addComponent(UITransform).setContentSize(width, height);
     this.viewLayer!.addChild(n);
+    return n;
+  }
+
+  private uiNodeIn(parent: Node, name: string, width: number, height: number): Node {
+    const n = new Node(name);
+    n.layer = Layers.Enum.UI_2D;
+    n.addComponent(UITransform).setContentSize(width, height);
+    parent.addChild(n);
     return n;
   }
 
@@ -393,9 +409,109 @@ export class SpikeController extends Component {
     return n;
   }
 
+  private viewportFor(mode: string): { y: number; height: number } {
+    const h = view.getVisibleSize().height;
+    const top = h / 2;
+    const bottom = -h / 2;
+    if (mode === 'puzzle') {
+      const barHeight = 300;
+      const imageTop = top - this.safeTop - 250;
+      const imageBottom = bottom + this.safeBottom + barHeight + 14;
+      return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
+    }
+    const buttonY = this.bottomY(75);
+    const panelHeight = 300;
+    const panelBottom = buttonY + 43 + 18;
+    const imageTop = top - this.safeTop - 250;
+    const imageBottom = panelBottom + panelHeight + 14;
+    return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
+  }
+
+  private storyLayout(): { panelY: number; buttonY: number } {
+    const buttonY = this.bottomY(75);
+    const panelHeight = 300;
+    const panelBottom = buttonY + 43 + 18;
+    return { panelY: panelBottom + panelHeight / 2, buttonY };
+  }
+
+  private drawArtViewport(actIndex: number, mode: string) {
+    const w = 750;
+    const h = view.getVisibleSize().height;
+    const bg = this.uiNode('PageBg', w, h);
+    const bgGraphics = bg.addComponent(Graphics);
+    bgGraphics.fillColor = INK;
+    bgGraphics.rect(-w / 2, -h / 2, w, h);
+    bgGraphics.fill();
+
+    const viewport = this.viewportFor(mode);
+    this.artViewport = viewport;
+    this.artViewportNode = null;
+    this.artDisplay = { width: 0, height: 0 };
+
+    const frame = this.artFrames.get(this.artName(actIndex, mode));
+    if (frame) {
+      const shown = this.artDisplaySize(frame, w, viewport.height, mode === 'puzzle' ? 'cover' : 'contain');
+      const vp = this.uiNode('ArtViewport', w, viewport.height);
+      vp.setPosition(0, viewport.y);
+      const image = new Node('ViewportArt');
+      image.layer = Layers.Enum.UI_2D;
+      image.addComponent(UITransform);
+      const sprite = image.addComponent(Sprite);
+      sprite.spriteFrame = frame;
+      sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+      image.getComponent(UITransform)!.setContentSize(shown.width, shown.height);
+      vp.addChild(image);
+      image.setPosition(0, 0);
+      this.artViewportNode = vp;
+      this.artDisplay = shown;
+    }
+
+    // Cover the parts of the oversized image that would spill into the
+    // header/footer. The screen clips the left/right overflow.
+    const imageTop = viewport.y + viewport.height / 2;
+    const imageBottom = viewport.y - viewport.height / 2;
+    const headerHeight = h / 2 - imageTop;
+    if (headerHeight > 0) {
+      const headerBg = this.uiNode('HeaderBg', w, headerHeight);
+      headerBg.setPosition(0, h / 2 - headerHeight / 2);
+      const hg = headerBg.addComponent(Graphics);
+      hg.fillColor = INK;
+      hg.rect(-w / 2, -headerHeight / 2, w, headerHeight);
+      hg.fill();
+    }
+    const footerHeight = imageBottom + h / 2;
+    if (footerHeight > 0) {
+      const footerBg = this.uiNode('FooterBg', w, footerHeight);
+      footerBg.setPosition(0, -h / 2 + footerHeight / 2);
+      const fg = footerBg.addComponent(Graphics);
+      fg.fillColor = INK;
+      fg.rect(-w / 2, -footerHeight / 2, w, footerHeight);
+      fg.fill();
+    }
+
+    if (mode === 'puzzle') {
+      const barHeight = this.safeBottom + 300;
+      const bar = this.uiNode('PuzzleBar', w, barHeight);
+      bar.setPosition(0, -h / 2 + barHeight / 2);
+      const g = bar.addComponent(Graphics);
+      g.fillColor = new Color(10, 22, 29, 255);
+      g.rect(-w / 2, -barHeight / 2, w, barHeight);
+      g.fill();
+      g.lineWidth = 1;
+      g.strokeColor = new Color(213, 168, 90, 95);
+      g.moveTo(-w / 2, barHeight / 2);
+      g.lineTo(w / 2, barHeight / 2);
+      g.stroke();
+    }
+  }
+
   private drawScene(actIndex: number, mode = 'story') {
     const w = 750;
     const h = view.getVisibleSize().height;
+    if (mode === 'story' || mode === 'puzzle') {
+      this.drawArtViewport(actIndex, mode);
+      return;
+    }
     const frame = this.artFrames.get(this.artName(actIndex, mode));
     if (frame) {
       const shown = this.artDisplaySize(frame, w, h);
@@ -595,12 +711,11 @@ export class SpikeController extends Component {
     this.drawScene(actIndex, 'story');
     this.header(act.kicker, act.title);
 
-    const h = view.getVisibleSize().height;
-    const panelY = this.bottomY(360);
-    this.panel(0, panelY, 660, 430);
-    this.label(act.pages[pageIndex], 0, panelY + 35, 38, PAPER, 590, 270);
-    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, panelY - 155, 26, MUTED);
-    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, this.bottomY(75), 540, 86, () => {
+    const layout = this.storyLayout();
+    this.panel(0, layout.panelY, 660, 300);
+    this.label(act.pages[pageIndex], 0, layout.panelY + 8, 38, PAPER, 590, 190);
+    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, layout.panelY - 112, 26, MUTED);
+    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, layout.buttonY, 540, 86, () => {
       this.showStory(actIndex, pageIndex + 1);
     });
   }
@@ -624,19 +739,19 @@ export class SpikeController extends Component {
 
     this.label(act.puzzle.prompt, 0, top - this.safeTop - 170, 32, PAPER, 650);
     this.progressLabel = null;
-    this.hintText = this.label('', 0, this.bottomY(300), 26, GOLD, 690);
+    this.hintText = this.label('', 0, top - this.safeTop - 208, 22, GOLD, 690, 44);
 
-    const artMode = this.artFrames.size > 0;
-    const puzzleFrame = this.artFrames.get(this.artName(actIndex, 'puzzle'));
-    const display = puzzleFrame ? this.artDisplaySize(puzzleFrame, view.getVisibleSize().width, h) : null;
+    const display = this.artDisplay;
+    const artMode = Boolean(this.artViewportNode) && display.width > 0 && display.height > 0;
+    const parent = this.artViewportNode || this.viewLayer!;
     for (const target of act.puzzle.targets) {
-      const px = artMode && display ? (target.x - 0.5) * display.width : -330 + target.x * 660;
-      const py = artMode && display ? (target.y - 0.5) * display.height : areaBottom + target.y * (areaTop - areaBottom);
+      const px = artMode ? (target.x - 0.5) * display.width : -330 + target.x * 660;
+      const py = artMode ? (target.y - 0.5) * display.height : areaBottom + target.y * (areaTop - areaBottom);
       const hitSize = artMode ? (['head', 'beak', 'stone'].includes(target.id) ? 86 : 112) : 130;
-      const n = this.uiNode(`target-${target.id}`, hitSize, hitSize);
+      const n = this.uiNodeIn(parent, `target-${target.id}`, hitSize, hitSize);
       n.setPosition(px, py);
       n.setScale(1.08, 1.08, 1);
-      if (this.artFrames.size === 0) {
+      if (!artMode) {
         const g = n.addComponent(Graphics);
         this.drawIcon(g, target.icon);
       }
@@ -646,9 +761,9 @@ export class SpikeController extends Component {
     }
 
     for (const cover of act.puzzle.covers || []) {
-      const px = artMode && display ? (cover.x - 0.5) * display.width : -330 + cover.x * 660;
-      const py = artMode && display ? (cover.y - 0.5) * display.height : areaBottom + cover.y * (areaTop - areaBottom);
-      const n = this.uiNode(`cover-${cover.id}`, cover.w, cover.h);
+      const px = artMode ? (cover.x - 0.5) * display.width : -330 + cover.x * 660;
+      const py = artMode ? (cover.y - 0.5) * display.height : areaBottom + cover.y * (areaTop - areaBottom);
+      const n = this.uiNodeIn(parent, `cover-${cover.id}`, cover.w, cover.h);
       n.setPosition(px, py);
       const g = n.addComponent(Graphics);
       this.drawCover(g, cover);
@@ -700,11 +815,12 @@ export class SpikeController extends Component {
     if (hasIcon) {
       const iconNode = new Node('PillIcon');
       iconNode.layer = Layers.Enum.UI_2D;
-      iconNode.addComponent(UITransform).setContentSize(38, 38);
+      iconNode.addComponent(UITransform);
       if (icon) {
         const sp = iconNode.addComponent(Sprite);
         sp.spriteFrame = icon;
         sp.sizeMode = Sprite.SizeMode.CUSTOM;
+        iconNode.getComponent(UITransform)!.setContentSize(38, 38);
       } else {
         const g = iconNode.addComponent(Graphics);
         iconNode.setScale(0.55, 0.55, 1);

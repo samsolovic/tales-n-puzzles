@@ -244,21 +244,24 @@ Why the patch is needed:
 
 After a WeChat DevTools "编译", you do **not** need to run it again. It is only for a new Cocos build.
 
-### Aspect handling
+### Layout: playable image area is separate from UI
 
-The chapter art is 9:16 (1440×2560), but WeChat phones render at a taller visible design size (for example 750×1666). Forcing the sprite to 750×1666 stretched the figures vertically.
-
-The background now uses **aspect-fill / cover**:
+The chapter screens no longer draw the story text or the puzzle controls on top of the artwork.
 
 ```text
-scale = max(screenWidth / imageWidth, screenHeight / imageHeight)
-displayWidth = imageWidth * scale
-displayHeight = imageHeight * scale
+Header (safe area)
+Image viewport
+Story text + button     or     fixed puzzle bar (pills + hint)
 ```
 
-The sprite is slightly wider than the screen and is clipped at the two sides; the image is never stretched. Puzzle hit zones use the same displayed width/height, so target positions stay aligned.
+- Story: the image uses `contain`, so the whole 9:16 picture is visible; side bars use the page background.
+- Puzzle: the image uses `cover` inside the viewport, so it fills the playable area; the fixed bar below is not over the art.
+- The image viewport is `750 × (screenHeight - header - bottomUI)`.
+- Puzzle hit zones use the viewport's displayed width/height, not the full screen.
+- The bottom puzzle bar sits outside the image; pills, hint button and status text never cover a target.
+- Story text sits outside the image; the panel and continue button do not cover the picture.
 
-Trade-off: on tall phones a little of the left/right edge is cropped. If that becomes a problem, switch `artDisplaySize` to `min(...)` (contain/letterbox) and add a background color or title bar above/below the art.
+Trade-off: the story image is smaller and has side bars; the puzzle image crops a little top/bottom to fill the viewport. This is deliberate: story prioritizes the full composition, puzzle prioritizes a clean, unobstructed find area.
 
 ## Current machine status
 
