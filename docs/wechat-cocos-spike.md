@@ -199,7 +199,9 @@ The build order is:
 3. WeChat DevTools imports build/wechatgame and previews
 ```
 
-The patch step is **not** run inside WeChat DevTools. DevTools only opens the built folder; it does not regenerate Cocos asset bundles.
+The build template `wechat-minigame/build-templates/wechatgame/game.json` now writes the `chapter-jingwei` subpackage automatically on every Cocos build. A rebuild will no longer silently drop it.
+
+The patch step is only needed to restore the real AppID, and to verify the output. It is **not** run inside WeChat DevTools. DevTools only opens the built folder; it does not regenerate Cocos asset bundles.
 
 If building from Cocos Creator's GUI:
 
