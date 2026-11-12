@@ -1,0 +1,11 @@
+{
+  "prompt": "Split this find-object scene into a clean base background and separate foreground object layers. Keep the girl, the boat, the seabird, the shell, the jade pendant on cloth, the leaf, the rocks, the reeds and the sea as distinct elements where possible.",
+  "reference": ".tmp/act1-puzzle-v2-2k.jpg",
+  "size": "2K",
+  "outDir": "docs/art/scenes",
+  "prefix": "act1-puzzle-layers",
+  "extra": {
+    "layer_decomposition": true,
+    "output_format": "png"
+  }
+}

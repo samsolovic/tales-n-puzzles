@@ -39,6 +39,18 @@ The generator will:
 - create a contact sheet for review
 - never place the API key in logs or git
 
+## Layer decomposition
+
+Seedream 5.0 Pro supports `layer_decomposition: true` on the same endpoint.
+
+- Input: one reference image
+- Size: resolution tier only (`1K` / `1.5K` / `2K`), not `widthxheight`
+- Output: base image `z_index: 0` plus transparent PNG layers with `z_index`, `name`, `description`, `bounding_box`
+- Use `output_format: "png"`
+- One layer request pre-authorizes up to 17 IPM and bills successful layers
+
+Example config: `tools/art/prompts/act1-puzzle-layers.json`.
+
 ## First test
 
 Do not start with 20 images. Generate **one** 9:16 Act 1 attempt first, check billing, latency, reference consistency, and output size. Then batch.

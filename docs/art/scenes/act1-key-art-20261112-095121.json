@@ -1,0 +1,18 @@
+{
+  "run": "act1-key-art-20261112-095121",
+  "prompt": "Use the provided image as the exact character and style reference. The same 15-year-old ancient Chinese girl, same face, same blue cross-collar robe, same ochre shawl, same jade hairpin, barefoot. Vertical 9:16 Chinese mythological storybook illustration. She stands smaller on the left side of a rocky shore at dusk, seen in three-quarter profile, looking at the East Sea, wind lifting the shawl. A small wooden boat is moored on the left. Distant Mount Fajiu on the horizon. Pale moon in the upper right. Foreground across the lower half: zebrawood leaves, shells, reeds, a jade pendant resting on a piece of cloth, a seabird on a rock. The foreground is arranged so five small objects are findable but not obvious. Keep the girl's head below the top 15% UI safe zone and keep the bottom 22% free of critical objects. Mineral pigment on silk, fine ink linework, muted azurite, malachite, ochre and pale gold, less orange sunset, more stone-blue dusk. No text, no watermark, no logo, no modern objects, no anime, no 3D render.",
+  "reference": "docs/art/characters/nvwa-character-v3.jpg",
+  "requestedModel": "doubao-seedream-5-0-pro-260628",
+  "requestedSize": "1440x2560",
+  "responseModel": "doubao-seedream-5-0-pro-260628",
+  "responseCreated": 1794448281,
+  "images": [
+    "/Users/sam/AgentSharedProjects/tales-n-puzzles/docs/art/scenes/act1-key-art-20261112-095121-1.jpg"
+  ],
+  "rawUsage": {
+    "input_images": 1,
+    "generated_images": 1,
+    "output_tokens": 14400,
+    "total_tokens": 14400
+  }
+}

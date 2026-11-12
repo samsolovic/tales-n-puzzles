@@ -1,0 +1,18 @@
+{
+  "run": "act1-puzzle-plate-v2-20261112-095633",
+  "prompt": "Edit this image while preserving the girl, boat, seabird, sea, sky, mountains, colors and painting style. Move the shell, the jade pendant on the cloth, and the fallen leaf upward into the middle band of the shore, between 45% and 65% of the image height. Remove every shell, jade, cloth and leaf from the bottom 25% of the frame. The bottom quarter must contain only plain sand, rocks and water. All five findable objects — leaf, shell, small boat, jade pendant on cloth, seabird — must sit above 70% of the image height and remain clearly visible but not too obvious. Keep the girl smaller on the left, the boat in the middle-left water, the bird on the right rocks. Vertical 9:16, mineral pigment on silk, stone-blue dusk, fine ink linework. No text, no watermark, no logo, no new objects, no modern objects, no anime, no 3D render.",
+  "reference": "docs/art/scenes/act1-puzzle-plate-20261112-095412-1.jpg",
+  "requestedModel": "doubao-seedream-5-0-pro-260628",
+  "requestedSize": "1440x2560",
+  "responseModel": "doubao-seedream-5-0-pro-260628",
+  "responseCreated": 1794448593,
+  "images": [
+    "/Users/sam/AgentSharedProjects/tales-n-puzzles/docs/art/scenes/act1-puzzle-plate-v2-20261112-095633-1.jpg"
+  ],
+  "rawUsage": {
+    "input_images": 1,
+    "generated_images": 1,
+    "output_tokens": 14400,
+    "total_tokens": 14400
+  }
+}

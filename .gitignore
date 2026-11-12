@@ -3,6 +3,7 @@ node_modules/
 .preview/
 .DS_Store
 *.log
+.tmp/
 .env
 .env.*
 !.env.example

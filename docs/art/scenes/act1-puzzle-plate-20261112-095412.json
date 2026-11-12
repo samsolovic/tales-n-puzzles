@@ -1,0 +1,18 @@
+{
+  "run": "act1-puzzle-plate-20261112-095412",
+  "prompt": "Use the provided image as the exact scene, character, palette and style reference. Recompose it as a find-object puzzle background for a vertical 9:16 game. The same 15-year-old ancient Chinese girl stands smaller on the left side of the rocky shore, in three-quarter profile, looking at the East Sea. Same blue cross-collar robe, ochre shawl, jade hairpin, barefoot. Keep the small wooden boat on the left, the single seabird on a rock at right, reeds at far right, distant mountain, pale moon upper right. Place the five findable objects clearly but not too obviously across the middle 45%–72% vertical band: a zebrawood leaf, a large shell, a jade pendant resting on a piece of cloth, the small boat, the seabird. The bottom 22% must be plain sand, rock and water only, with no critical objects, no shell, no jade, no cloth. The top 15% must be plain sky for the WeChat capsule/header. Mineral pigment on silk, fine ink linework, muted azurite, malachite, ochre and pale gold, stone-blue dusk, subtle paper grain. No text, no watermark, no logo, no modern objects, no anime, no 3D render.",
+  "reference": "docs/art/scenes/act1-candidate-4.jpg",
+  "requestedModel": "doubao-seedream-5-0-pro-260628",
+  "requestedSize": "1440x2560",
+  "responseModel": "doubao-seedream-5-0-pro-260628",
+  "responseCreated": 1794448452,
+  "images": [
+    "/Users/sam/AgentSharedProjects/tales-n-puzzles/docs/art/scenes/act1-puzzle-plate-20261112-095412-1.jpg"
+  ],
+  "rawUsage": {
+    "input_images": 1,
+    "generated_images": 1,
+    "output_tokens": 14400,
+    "total_tokens": 14400
+  }
+}
