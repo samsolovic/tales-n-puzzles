@@ -208,6 +208,13 @@ export class SpikeController extends Component {
     });
   }
 
+  private artDisplaySize(frame: SpriteFrame, width: number, height: number): { width: number; height: number } {
+    const imageWidth = frame.originalSize?.width || frame.rect?.width || width;
+    const imageHeight = frame.originalSize?.height || frame.rect?.height || height;
+    const scale = Math.max(width / imageWidth, height / imageHeight);
+    return { width: imageWidth * scale, height: imageHeight * scale };
+  }
+
   private artName(actIndex: number, mode: string): string {
     if (actIndex === 0) return mode === 'puzzle' ? 'act1-puzzle' : 'act1-story';
     return actIndex === 1 ? 'act2' : 'act3';
@@ -391,11 +398,12 @@ export class SpikeController extends Component {
     const h = view.getVisibleSize().height;
     const frame = this.artFrames.get(this.artName(actIndex, mode));
     if (frame) {
-      const n = this.uiNode('SceneArt', w, h);
+      const shown = this.artDisplaySize(frame, w, h);
+      const n = this.uiNode('SceneArt', shown.width, shown.height);
       const sp = n.addComponent(Sprite);
       sp.spriteFrame = frame;
       sp.sizeMode = Sprite.SizeMode.CUSTOM;
-      n.getComponent(UITransform)!.setContentSize(w, h);
+      n.getComponent(UITransform)!.setContentSize(shown.width, shown.height);
       if (mode === 'story') {
         this.artShade(-h / 2 + h * 0.22, h * 0.44, 190);
       } else if (mode === 'title' || mode === 'blank') {
@@ -619,9 +627,11 @@ export class SpikeController extends Component {
     this.hintText = this.label('', 0, this.bottomY(300), 26, GOLD, 690);
 
     const artMode = this.artFrames.size > 0;
+    const puzzleFrame = this.artFrames.get(this.artName(actIndex, 'puzzle'));
+    const display = puzzleFrame ? this.artDisplaySize(puzzleFrame, view.getVisibleSize().width, h) : null;
     for (const target of act.puzzle.targets) {
-      const px = artMode ? -375 + target.x * 750 : -330 + target.x * 660;
-      const py = artMode ? -h / 2 + target.y * h : areaBottom + target.y * (areaTop - areaBottom);
+      const px = artMode && display ? (target.x - 0.5) * display.width : -330 + target.x * 660;
+      const py = artMode && display ? (target.y - 0.5) * display.height : areaBottom + target.y * (areaTop - areaBottom);
       const hitSize = artMode ? (['head', 'beak', 'stone'].includes(target.id) ? 86 : 112) : 130;
       const n = this.uiNode(`target-${target.id}`, hitSize, hitSize);
       n.setPosition(px, py);
@@ -636,8 +646,8 @@ export class SpikeController extends Component {
     }
 
     for (const cover of act.puzzle.covers || []) {
-      const px = artMode ? -375 + cover.x * 750 : -330 + cover.x * 660;
-      const py = artMode ? -h / 2 + cover.y * h : areaBottom + cover.y * (areaTop - areaBottom);
+      const px = artMode && display ? (cover.x - 0.5) * display.width : -330 + cover.x * 660;
+      const py = artMode && display ? (cover.y - 0.5) * display.height : areaBottom + cover.y * (areaTop - areaBottom);
       const n = this.uiNode(`cover-${cover.id}`, cover.w, cover.h);
       n.setPosition(px, py);
       const g = n.addComponent(Graphics);
