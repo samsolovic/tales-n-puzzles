@@ -21,6 +21,7 @@ env -u ELECTRON_RUN_AS_NODE "$COCOS" \
   --build "platform=wechatgame;debug=$([[ "$MODE" == "debug" ]] && echo true || echo false)"
 
 echo "==> Patch WeChat subpackage + AppID"
+sleep 1
 node "$ROOT/tools/art/patch-wechat-build.mjs"
 
 echo "==> Done"
