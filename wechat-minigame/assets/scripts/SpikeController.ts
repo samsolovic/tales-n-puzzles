@@ -36,7 +36,7 @@ const LAYOUT = {
   headerHeight: 250,
   puzzleBarHeight: 300,
   storyPanelWidth: 660,
-  storyPanelHeight: 300,
+  storyPanelHeight: 260,
   storyButtonWidth: 540,
   storyButtonHeight: 86,
   pillWidth: 202,
@@ -421,22 +421,45 @@ export class SpikeController extends Component {
     return n;
   }
 
-  private viewportFor(mode: string): { y: number; height: number } {
+  private contentWidth(): number {
+    return view.getVisibleSize().width - LAYOUT.sideMargin * 2;
+  }
+
+  private viewportFor(mode: string): { y: number; height: number; width: number } {
     const h = view.getVisibleSize().height;
     const top = h / 2;
     const bottom = -h / 2;
+    const width = this.contentWidth();
     if (mode === 'puzzle') {
       const barHeight = LAYOUT.puzzleBarHeight;
-      const imageTop = top - this.safeTop - LAYOUT.headerHeight;
+      const imageTop = top;
       const imageBottom = bottom + this.safeBottom + barHeight + 14;
-      return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
+      return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom), width };
     }
     const buttonY = this.bottomY(75);
     const panelHeight = LAYOUT.storyPanelHeight;
     const panelBottom = buttonY + 43 + 18;
-    const imageTop = top - this.safeTop - LAYOUT.headerHeight;
+    const imageTop = top;
     const imageBottom = panelBottom + panelHeight + 14;
-    return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom) };
+    return { y: (imageTop + imageBottom) / 2, height: Math.max(300, imageTop - imageBottom), width };
+  }
+
+  private drawTopGradient() {
+    const w = 750;
+    const h = view.getVisibleSize().height;
+    const top = h / 2;
+    const gradHeight = Math.min(h * 0.42, this.safeTop + LAYOUT.headerHeight);
+    const steps = 28;
+    const slice = gradHeight / steps;
+    for (let i = 0; i < steps; i += 1) {
+      const alpha = Math.round(128 * (1 - (i + 0.5) / steps));
+      const n = this.uiNode('HeaderGradient', w, slice + 1);
+      n.setPosition(0, top - i * slice - slice / 2);
+      const g = n.addComponent(Graphics);
+      g.fillColor = new Color(0, 0, 0, alpha);
+      g.rect(-w / 2, -(slice + 1) / 2, w, slice + 1);
+      g.fill();
+    }
   }
 
   private storyLayout(): { panelY: number; buttonY: number } {
@@ -462,8 +485,8 @@ export class SpikeController extends Component {
 
     const frame = this.artFrames.get(this.artName(actIndex, mode));
     if (frame) {
-      const shown = this.artDisplaySize(frame, w, viewport.height, mode === 'puzzle' ? 'cover' : 'contain');
-      const vp = this.uiNode('ArtViewport', w, viewport.height);
+      const shown = this.artDisplaySize(frame, w, viewport.height, 'cover');
+      const vp = this.uiNode('ArtViewport', viewport.width, viewport.height);
       vp.setPosition(0, viewport.y);
       const image = new Node('ViewportArt');
       image.layer = Layers.Enum.UI_2D;
@@ -478,19 +501,12 @@ export class SpikeController extends Component {
       this.artDisplay = shown;
     }
 
+    this.drawTopGradient();
+
     // Cover the parts of the oversized image that would spill into the
-    // header/footer. The screen clips the left/right overflow.
+    // footer. The screen clips the left/right overflow.
     const imageTop = viewport.y + viewport.height / 2;
     const imageBottom = viewport.y - viewport.height / 2;
-    const headerHeight = h / 2 - imageTop;
-    if (headerHeight > 0) {
-      const headerBg = this.uiNode('HeaderBg', w, headerHeight);
-      headerBg.setPosition(0, h / 2 - headerHeight / 2);
-      const hg = headerBg.addComponent(Graphics);
-      hg.fillColor = INK;
-      hg.rect(-w / 2, -headerHeight / 2, w, headerHeight);
-      hg.fill();
-    }
     const footerHeight = imageBottom + h / 2;
     if (footerHeight > 0) {
       const footerBg = this.uiNode('FooterBg', w, footerHeight);
@@ -651,6 +667,7 @@ export class SpikeController extends Component {
   private showTitle() {
     this.clearView();
     this.drawScene(0, 'title');
+    this.drawTopGradient();
     const top = view.getVisibleSize().height / 2;
     const shift = this.safeTop;
     this.label('解谜涨知识', 0, top - shift - 170, 76, PAPER);
@@ -724,10 +741,10 @@ export class SpikeController extends Component {
     this.header(act.kicker, act.title);
 
     const layout = this.storyLayout();
-    this.panel(0, layout.panelY, LAYOUT.storyPanelWidth, LAYOUT.storyPanelHeight);
-    this.label(act.pages[pageIndex], 0, layout.panelY + 8, 38, PAPER, 590, 190);
-    this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, layout.panelY - 112, 26, MUTED);
-    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, layout.buttonY, LAYOUT.storyButtonWidth, LAYOUT.storyButtonHeight, () => {
+    this.panel(0, layout.panelY, this.contentWidth(), LAYOUT.storyPanelHeight);
+    this.label(act.pages[pageIndex], 0, layout.panelY + 8, 32, PAPER, 590, 190);
+    // this.label(`${pageIndex + 1} / ${act.pages.length}`, 0, layout.panelY - 112, 26, MUTED);
+    this.button(pageIndex === act.pages.length - 1 ? '进入本幕谜题' : '继续', 0, layout.buttonY, this.contentWidth(), LAYOUT.storyButtonHeight, () => {
       this.showStory(actIndex, pageIndex + 1);
     });
   }
@@ -786,8 +803,8 @@ export class SpikeController extends Component {
     const pillW = LAYOUT.pillWidth;
     const pillH = LAYOUT.pillHeight;
     const listLift = this.safeBottom;
-    const row1Y = bottom + 235 + listLift;
-    const row2Y = bottom + 165 + listLift;
+    const row1Y = bottom + 205 + listLift;
+    const row2Y = bottom + 135 + listLift;
     act.puzzle.targets.forEach((target, index) => {
       let x = 0;
       let y = row1Y;

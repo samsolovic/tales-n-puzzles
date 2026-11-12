@@ -12,10 +12,11 @@
 
 ```ts
 const LAYOUT = {
+  sideMargin: 24,
   headerHeight: 250,
   puzzleBarHeight: 300,
-  storyPanelWidth: 660,
-  storyPanelHeight: 300,
+  storyPanelWidth: 660, // legacy, story uses contentWidth()
+  storyPanelHeight: 260,
   storyButtonWidth: 540,
   storyButtonHeight: 86,
   pillWidth: 202,
@@ -40,11 +41,15 @@ storyPanelHeight: 300,   // 剧情文字面板，改小 → 剧情图片变高
 改：
 
 ```ts
-storyPanelHeight: 300,
+storyPanelHeight: 260,
 storyButtonHeight: 86,
 ```
 
-同时调整 `showStory()` 里的文字框高度。
+同时调整 `showStory()` 里的文字框高度。剧情面板和按钮宽度现在由 `contentWidth()` 计算：
+
+```ts
+750 - LAYOUT.sideMargin * 2
+```
 
 ## 2. 图片显示区
 
@@ -72,20 +77,19 @@ storyPanelHeight: 300,
 约第 449 行 `drawArtViewport()`：
 
 ```ts
-const shown = this.artDisplaySize(
-  frame,
-  w,
-  viewport.height,
-  mode === 'puzzle' ? 'cover' : 'contain',
-);
+const shown = this.artDisplaySize(frame, viewport.width, viewport.height, 'cover');
 ```
+
+当前剧情和寻物都用 `cover`，让图片左右边缘与剧情面板的 24px 间隔对齐。
+
+如果想让剧情完整显示、不裁切，把 `'cover'` 改成 `'contain'`；代价是左右会出现更大的深色留边。
 
 - `cover`：填满显示区，裁掉多余部分
 - `contain`：完整显示，留边
 
 当前：
 
-- 剧情：`contain`，保证整张画完整
+- 剧情：`cover`，图片左右边缘与面板对齐
 - 寻物：`cover`，保证操作区干净、画面填满
 
 如果想把剧情也改成填满：
@@ -100,7 +104,24 @@ mode === 'puzzle' || mode === 'story' ? 'cover' : 'contain'
 'contain'
 ```
 
-## 3. 底部物品栏
+## 3. 顶部渐变遮罩
+
+`drawTopGradient()` 从屏幕顶部往下画 28 条半透明黑带：
+
+- 顶部 `rgba(0,0,0,0.5)`
+- 底部 `rgba(0,0,0,0)`
+
+它画在图片上方、header 文字下方，用于压暗浅色天空。
+
+顶部渐变高度由：
+
+```ts
+this.safeTop + LAYOUT.headerHeight
+```
+
+控制。
+
+## 4. 底部物品栏
 
 约第 735 行 `showPuzzle()`。
 
@@ -129,7 +150,7 @@ this.button('提示 · 3', -175, this.bottomY(55), 250, 70, ...)
 this.label('找到所有物品即可继续', 175, this.bottomY(55), 24, ...)
 ```
 
-## 4. 寻物点击坐标
+## 5. 寻物点击坐标
 
 目标位置在：
 
@@ -157,7 +178,7 @@ const py = (target.y - 0.5) * display.height;
 
 如果图片换了、裁切方式变了，目标坐标要重新量。
 
-## 5. 剧情页
+## 6. 剧情页
 
 约第 713 行 `showStory()`。
 
@@ -171,7 +192,7 @@ this.button(..., 0, layout.buttonY, LAYOUT.storyButtonWidth, LAYOUT.storyButtonH
 
 文字和按钮都在图片外，不再覆盖画面。
 
-## 6. 美术资源
+## 7. 美术资源
 
 章节资源在：
 
@@ -200,7 +221,7 @@ private artName(actIndex: number, mode: string) {
 3. 在 `preloadArt()` 的 `images` 数组里加名字
 4. 在 `jingwei.json` 加目标坐标
 
-## 7. 改完怎么跑
+## 8. 改完怎么跑
 
 ### Cocos 预览
 
@@ -228,13 +249,13 @@ cd /Users/sam/AgentSharedProjects/tales-n-puzzles
 node tools/art/patch-wechat-build.mjs
 ```
 
-## 8. 不要改的地方
+## 9. 不要改的地方
 
 - 不要改 `build/wechatgame` 里的 JS/JSON，下一次构建会覆盖
 - 不要改 `library/`、`temp/`
 - 不要改 `assets/bundles/chapter-jingwei.meta` 里的 bundle 配置，除非你知道后果
 
-## 9. 常见问题
+## 10. 常见问题
 
 ### 图片被拉伸
 
