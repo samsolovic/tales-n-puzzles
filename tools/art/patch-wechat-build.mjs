@@ -31,6 +31,12 @@ function sizeOf(dir) {
 }
 
 const chapter = path.join(build, 'assets/chapter-jingwei');
+if (fs.existsSync(chapter)) {
+  const entry = path.join(chapter, 'game.js');
+  if (!fs.existsSync(entry)) {
+    fs.writeFileSync(entry, '// Asset-only WeChat subpackage.\n');
+  }
+}
 const all = sizeOf(build);
 const sub = fs.existsSync(chapter) ? sizeOf(chapter) : 0;
 console.log(JSON.stringify({

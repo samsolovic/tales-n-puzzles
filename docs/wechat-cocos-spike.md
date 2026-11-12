@@ -201,7 +201,19 @@ The build order is:
 
 The build template `wechat-minigame/build-templates/wechatgame/game.json` now writes the `chapter-jingwei` subpackage automatically on every Cocos build. A rebuild will no longer silently drop it.
 
-The patch step is only needed to restore the real AppID, and to verify the output. It is **not** run inside WeChat DevTools. DevTools only opens the built folder; it does not regenerate Cocos asset bundles.
+The patch step is only needed to restore the real AppID, add the WeChat-required `game.js` stub to the asset-only subpackage, and verify the output. It is **not** run inside WeChat DevTools. DevTools only opens the built folder; it does not regenerate Cocos asset bundles.
+
+WeChat requires a `game.js` entry inside every subpackage, even when the subpackage only contains Cocos Asset Bundle assets. The template and patch script add:
+
+```text
+build/wechatgame/assets/chapter-jingwei/game.js
+```
+
+Without it, DevTools reports:
+
+```text
+未找到 ["subpackages"][0]["root"] 对应的 /assets/chapter-jingwei/game.js 文件
+```
 
 If building from Cocos Creator's GUI:
 
