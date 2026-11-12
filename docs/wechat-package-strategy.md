@@ -118,13 +118,19 @@ assetManager.loadBundle('chapter-jingwei', (err, bundle) => {
 - 总包：**5.85MB**
 - 仍远低于 30MB
 
-构建后需要运行：
+构建后需要运行一次补丁：
 
 ```bash
 node tools/art/patch-wechat-build.mjs
 ```
 
-它会把 `assets/chapter-jingwei/` 写进微信 `game.json` 的 `subpackages`，并修正 AppID。
+或直接使用一键构建：
+
+```bash
+./tools/art/build-wechat.sh
+```
+
+它会把 `assets/chapter-jingwei/` 写进微信 `game.json` 的 `subpackages`，并修正 AppID。这个脚本在 **Cocos 构建之后**运行，不是在微信开发者工具里运行。微信开发者工具只负责导入 `build/wechatgame` 后预览。
 
 ## 单机还是联网
 

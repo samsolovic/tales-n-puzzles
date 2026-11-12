@@ -188,6 +188,48 @@ The runtime calls `wx.loadSubpackage({ name: 'chapter-jingwei' })` before `asset
 - Covers are still Cocos-drawn cloth/rock shapes rather than painted cover art.
 - Real-device validation is still required for the subpackage download and the Android safe area.
 
+
+### WeChat build workflow (important)
+
+The build order is:
+
+```text
+1. Cocos Creator builds the WeChat game
+2. Terminal runs the post-build patch
+3. WeChat DevTools imports build/wechatgame and previews
+```
+
+The patch step is **not** run inside WeChat DevTools. DevTools only opens the built folder; it does not regenerate Cocos asset bundles.
+
+If building from Cocos Creator's GUI:
+
+```bash
+cd /Users/sam/AgentSharedProjects/tales-n-puzzles
+node tools/art/patch-wechat-build.mjs
+```
+
+Or use the one-command terminal build:
+
+```bash
+cd /Users/sam/AgentSharedProjects/tales-n-puzzles
+./tools/art/build-wechat.sh          # debug
+./tools/art/build-wechat.sh release  # release
+```
+
+Then import:
+
+```text
+/Users/sam/AgentSharedProjects/tales-n-puzzles/wechat-minigame/build/wechatgame
+```
+
+Why the patch is needed:
+
+- Cocos outputs `assets/chapter-jingwei/` but does not automatically put it in WeChat `subpackages`.
+- The patch adds the `chapter-jingwei` subpackage entry to `game.json`.
+- It also restores the real AppID/project name in `project.config.json`.
+
+After a WeChat DevTools "编译", you do **not** need to run it again. It is only for a new Cocos build.
+
 ## Current machine status
 
 Installed and verified:
